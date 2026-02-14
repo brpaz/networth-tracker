@@ -1,0 +1,53 @@
+{
+  "name": "networth-tracker",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.6.2",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^3.0.0",
+    "better-sqlite3": "^12.6.2",
+    "chart.js": "^4.4.0",
+    "drizzle-orm": "^0.44.0",
+    "nuxt": "^4.0.0",
+    "pino": "^9.0.0",
+    "pino-http": "^10.0.0",
+    "tailwindcss": "^4.0.0",
+    "vue": "^3.5.0",
+    "vue-chartjs": "^5.3.0",
+    "vue-router": "^4.5.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.90",
+    "@nuxt/eslint": "^1.0.0",
+    "@nuxt/test-utils": "^3.0.0",
+    "@playwright/test": "^1.50.0",
+    "@types/better-sqlite3": "^7.0.0",
+    "@vue/test-utils": "^2.4.6",
+    "drizzle-kit": "^0.31.0",
+    "eslint": "^9.0.0",
+    "happy-dom": "^20.6.1",
+    "lefthook": "^1.11.0",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

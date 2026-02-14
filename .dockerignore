@@ -1,0 +1,10 @@
+node_modules
+.nuxt
+.output
+.git
+*.md
+tests
+.github
+deploy
+devenv*
+.devenv
