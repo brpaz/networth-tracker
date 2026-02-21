@@ -1,104 +1,134 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createError } from 'h3'
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
+import { createTestDatabase, closeTestDatabase, getTestDatabase } from '../test/setup-db';
+import { NotFoundError } from '../errors';
 
-vi.stubGlobal('createError', createError)
+vi.mock('../database', () => ({
+  useDatabase: () => getTestDatabase(),
+}));
 
-const mockSnapshotRepo = {
-  create: vi.fn(),
-  findById: vi.fn(),
-  findByAccountId: vi.fn(),
-  deleteById: vi.fn(),
+import { useSnapshotService } from './snapshot.service';
+import { accounts, accountSnapshots } from '../database/schema';
+
+beforeEach(() => {
+  createTestDatabase();
+});
+
+afterAll(() => {
+  closeTestDatabase();
+});
+
+function insertAccount(overrides: Partial<{ name: string; type: string; currency: string }> = {}) {
+  const db = getTestDatabase();
+  const [account] = db
+    .insert(accounts)
+    .values({ name: 'Test Account', type: 'cash', currency: 'EUR', ...overrides })
+    .returning()
+    .all();
+  return account;
 }
-
-const mockAccountRepo = {
-  findById: vi.fn(),
-  touchUpdatedAt: vi.fn(),
-}
-
-vi.mock('../repositories/snapshot.repository', () => ({
-  useSnapshotRepository: () => mockSnapshotRepo,
-}))
-
-vi.mock('../repositories/account.repository', () => ({
-  useAccountRepository: () => mockAccountRepo,
-}))
-
-import { useSnapshotService } from './snapshot.service'
 
 describe('useSnapshotService', () => {
-  const service = useSnapshotService()
+  let service: ReturnType<typeof useSnapshotService>;
 
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    service = useSnapshotService();
+  });
 
   describe('recordSnapshot', () => {
-    it('creates snapshot and touches account updatedAt', async () => {
-      const account = { id: 1, name: 'Test' }
-      const snapshot = { id: 1, accountId: 1, value: 5000, recordedAt: new Date() }
-      mockAccountRepo.findById.mockResolvedValue(account)
-      mockSnapshotRepo.create.mockResolvedValue(snapshot)
-      mockAccountRepo.touchUpdatedAt.mockResolvedValue(undefined)
+    it('creates snapshot for existing account', async () => {
+      const account = insertAccount();
 
-      const result = await service.recordSnapshot({ accountId: 1, value: 5000 })
+      const result = await service.recordSnapshot({ accountId: account.id, value: 5000 });
 
-      expect(mockAccountRepo.findById).toHaveBeenCalledWith(1)
-      expect(mockSnapshotRepo.create).toHaveBeenCalledWith({ accountId: 1, value: 5000 })
-      expect(mockAccountRepo.touchUpdatedAt).toHaveBeenCalledWith(1)
-      expect(result).toEqual(snapshot)
-    })
+      expect(result.id).toBeDefined();
+      expect(result.accountId).toBe(account.id);
+      expect(result.value).toBe(5000);
+    });
 
-    it('throws 404 when account does not exist', async () => {
-      mockAccountRepo.findById.mockResolvedValue(undefined)
+    it('persists the snapshot to the database', async () => {
+      const account = insertAccount();
 
-      await expect(service.recordSnapshot({ accountId: 999, value: 100 })).rejects.toThrow()
-      expect(mockSnapshotRepo.create).not.toHaveBeenCalled()
-    })
-  })
+      await service.recordSnapshot({ accountId: account.id, value: 3000 });
+
+      const db = getTestDatabase();
+      const snapshots = db.select().from(accountSnapshots).all();
+      expect(snapshots).toHaveLength(1);
+      expect(snapshots[0].value).toBe(3000);
+    });
+
+    it('throws NotFoundError when account does not exist', async () => {
+      await expect(service.recordSnapshot({ accountId: 999, value: 100 })).rejects.toThrow(
+        NotFoundError,
+      );
+
+      const db = getTestDatabase();
+      const snapshots = db.select().from(accountSnapshots).all();
+      expect(snapshots).toHaveLength(0);
+    });
+  });
 
   describe('getAccountSnapshots', () => {
     it('returns snapshots for existing account', async () => {
-      const account = { id: 1, name: 'Test' }
-      const snapshots = [{ id: 1, accountId: 1, value: 1000, recordedAt: new Date() }]
-      mockAccountRepo.findById.mockResolvedValue(account)
-      mockSnapshotRepo.findByAccountId.mockResolvedValue(snapshots)
+      const account = insertAccount();
+      const db = getTestDatabase();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 1000 }).run();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 2000 }).run();
 
-      const result = await service.getAccountSnapshots(1, 50)
+      const result = await service.getAccountSnapshots(account.id);
 
-      expect(mockAccountRepo.findById).toHaveBeenCalledWith(1)
-      expect(mockSnapshotRepo.findByAccountId).toHaveBeenCalledWith(1, 50)
-      expect(result).toEqual(snapshots)
-    })
+      expect(result).toHaveLength(2);
+    });
 
-    it('throws 404 when account does not exist', async () => {
-      mockAccountRepo.findById.mockResolvedValue(undefined)
+    it('respects custom limit', async () => {
+      const account = insertAccount();
+      const db = getTestDatabase();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 1000 }).run();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 2000 }).run();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 3000 }).run();
 
-      await expect(service.getAccountSnapshots(999)).rejects.toThrow()
-      expect(mockSnapshotRepo.findByAccountId).not.toHaveBeenCalled()
-    })
-  })
+      const result = await service.getAccountSnapshots(account.id, 2);
+
+      expect(result).toHaveLength(2);
+    });
+
+    it('throws NotFoundError when account does not exist', async () => {
+      await expect(service.getAccountSnapshots(999)).rejects.toThrow(NotFoundError);
+    });
+  });
 
   describe('deleteSnapshot', () => {
-    it('deletes snapshot and touches account updatedAt', async () => {
-      const snapshot = { id: 1, accountId: 1, value: 5000, recordedAt: new Date() }
-      mockSnapshotRepo.findById.mockResolvedValue(snapshot)
-      mockSnapshotRepo.deleteById.mockResolvedValue(snapshot)
-      mockAccountRepo.touchUpdatedAt.mockResolvedValue(undefined)
+    it('deletes snapshot and returns it', async () => {
+      const account = insertAccount();
+      const db = getTestDatabase();
+      const [snapshot] = db
+        .insert(accountSnapshots)
+        .values({ accountId: account.id, value: 5000 })
+        .returning()
+        .all();
 
-      const result = await service.deleteSnapshot(1)
+      const result = await service.deleteSnapshot(snapshot.id);
 
-      expect(mockSnapshotRepo.findById).toHaveBeenCalledWith(1)
-      expect(mockSnapshotRepo.deleteById).toHaveBeenCalledWith(1)
-      expect(mockAccountRepo.touchUpdatedAt).toHaveBeenCalledWith(1)
-      expect(result).toEqual(snapshot)
-    })
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(snapshot.id);
+    });
 
-    it('throws 404 when snapshot does not exist', async () => {
-      mockSnapshotRepo.findById.mockResolvedValue(undefined)
+    it('actually removes snapshot from database', async () => {
+      const account = insertAccount();
+      const db = getTestDatabase();
+      const [snapshot] = db
+        .insert(accountSnapshots)
+        .values({ accountId: account.id, value: 5000 })
+        .returning()
+        .all();
 
-      await expect(service.deleteSnapshot(999)).rejects.toThrow()
-      expect(mockSnapshotRepo.deleteById).not.toHaveBeenCalled()
-      expect(mockAccountRepo.touchUpdatedAt).not.toHaveBeenCalled()
-    })
-  })
-})
+      await service.deleteSnapshot(snapshot.id);
+
+      const remaining = db.select().from(accountSnapshots).all();
+      expect(remaining).toHaveLength(0);
+    });
+
+    it('throws NotFoundError when snapshot does not exist', async () => {
+      await expect(service.deleteSnapshot(999)).rejects.toThrow(NotFoundError);
+    });
+  });
+});

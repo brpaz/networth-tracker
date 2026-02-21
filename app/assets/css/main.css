@@ -1,2 +1,8 @@
+/**
+ * Entry CSS file for the Application
+ *
+ * This file imports the Tailwind CSS framework and the Nuxt UI library.
+ * Any global styles or customizations can be added here.
+ */
 @import 'tailwindcss';
 @import '@nuxt/ui';

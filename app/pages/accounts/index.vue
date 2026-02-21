@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { accountTypes } from '~/types'
+import { accountTypes } from '~/types';
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'default' });
 
 const {
   accounts,
@@ -11,90 +11,99 @@ const {
   updateAccount,
   deleteAccount,
   recordSnapshot,
-} = useAccounts()
-const { formatCurrency } = useFormatters()
-const toast = useToast()
+} = useAccounts();
+const { formatCurrency } = useFormatters();
+const toast = useToast();
 
-await fetchAccounts()
+await fetchAccounts();
 
-const showForm = ref(false)
+const totalValue = computed(() =>
+  accounts.value.reduce((sum, a) => sum + (a.currentValue || 0), 0),
+);
+
+function pct(value: number | null) {
+  if (!totalValue.value || !value) return '0.0%';
+  return ((value / totalValue.value) * 100).toFixed(1) + '%';
+}
+
+const showForm = ref(false);
 const editingAccount = ref<{
-  id: number
-  name: string
-  type: string
-  currency: string
-} | null>(null)
+  id: number;
+  name: string;
+  type: string;
+  currency: string;
+} | null>(null);
 const formData = reactive({
   name: '',
   type: 'stocks' as string,
   currency: 'EUR',
-})
+});
 
-const showUpdateValue = ref(false)
-const updatingAccountId = ref<number | null>(null)
-const newValue = ref(0)
+const showUpdateValue = ref(false);
+const updatingAccountId = ref<number | null>(null);
+const newValue = ref(0);
 
 function openCreateForm() {
-  editingAccount.value = null
-  formData.name = ''
-  formData.type = 'stocks'
-  formData.currency = 'EUR'
-  showForm.value = true
+  editingAccount.value = null;
+  formData.name = '';
+  formData.type = 'stocks';
+  formData.currency = 'EUR';
+  showForm.value = true;
 }
 
 function openEditForm(account: { id: number; name: string; type: string; currency: string }) {
-  editingAccount.value = account
-  formData.name = account.name
-  formData.type = account.type
-  formData.currency = account.currency
-  showForm.value = true
+  editingAccount.value = account;
+  formData.name = account.name;
+  formData.type = account.type;
+  formData.currency = account.currency;
+  showForm.value = true;
 }
 
 async function submitForm() {
   try {
     if (editingAccount.value) {
-      await updateAccount(editingAccount.value.id, { ...formData })
-      toast.add({ title: 'Account updated', color: 'success' })
+      await updateAccount(editingAccount.value.id, { ...formData });
+      toast.add({ title: 'Account updated', color: 'success' });
     } else {
-      await createAccount({ ...formData })
-      toast.add({ title: 'Account created', color: 'success' })
+      await createAccount({ ...formData });
+      toast.add({ title: 'Account created', color: 'success' });
     }
-    showForm.value = false
+    showForm.value = false;
   } catch {
-    toast.add({ title: 'Error saving account', color: 'error' })
+    toast.add({ title: 'Error saving account', color: 'error' });
   }
 }
 
 function openUpdateValue(accountId: number, currentValue: number | null) {
-  updatingAccountId.value = accountId
-  newValue.value = currentValue || 0
-  showUpdateValue.value = true
+  updatingAccountId.value = accountId;
+  newValue.value = currentValue || 0;
+  showUpdateValue.value = true;
 }
 
 async function submitValue() {
-  if (updatingAccountId.value === null) return
+  if (updatingAccountId.value === null) return;
   try {
-    await recordSnapshot(updatingAccountId.value, newValue.value)
-    toast.add({ title: 'Value updated', color: 'success' })
-    showUpdateValue.value = false
+    await recordSnapshot(updatingAccountId.value, newValue.value);
+    toast.add({ title: 'Value updated', color: 'success' });
+    showUpdateValue.value = false;
   } catch {
-    toast.add({ title: 'Error updating value', color: 'error' })
+    toast.add({ title: 'Error updating value', color: 'error' });
   }
 }
 
 async function handleDelete(id: number) {
   try {
-    await deleteAccount(id)
-    toast.add({ title: 'Account deleted', color: 'success' })
+    await deleteAccount(id);
+    toast.add({ title: 'Account deleted', color: 'success' });
   } catch {
-    toast.add({ title: 'Error deleting account', color: 'error' })
+    toast.add({ title: 'Error deleting account', color: 'error' });
   }
 }
 
 const typeOptions = accountTypes.map((t) => ({
   label: t.charAt(0).toUpperCase() + t.slice(1),
   value: t,
-}))
+}));
 </script>
 
 <template>
@@ -116,24 +125,32 @@ const typeOptions = accountTypes.map((t) => ({
             <p class="text-sm text-muted">{{ account.type }} &middot; {{ account.currency }}</p>
           </NuxtLink>
           <div class="flex items-center gap-4">
-            <p class="text-xl font-bold text-primary">
-              {{ formatCurrency(account.currentValue || 0, account.currency) }}
-            </p>
+            <div class="text-right">
+              <p class="text-xl font-bold text-primary">
+                {{ formatCurrency(account.currentValue || 0, account.currency) }}
+              </p>
+              <UBadge variant="subtle" color="primary" class="mt-0.5">
+                {{ pct(account.currentValue) }}
+              </UBadge>
+            </div>
             <div class="flex gap-1">
               <UButton
                 icon="i-lucide-refresh-cw"
+                aria-label="Update value"
                 variant="ghost"
                 size="sm"
                 @click="openUpdateValue(account.id, account.currentValue)"
               />
               <UButton
                 icon="i-lucide-pencil"
+                aria-label="Edit account"
                 variant="ghost"
                 size="sm"
                 @click="openEditForm(account)"
               />
               <UButton
                 icon="i-lucide-trash-2"
+                aria-label="Delete account"
                 variant="ghost"
                 size="sm"
                 color="error"

@@ -14,7 +14,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: 'file:./data/networth.db',
+    public: {
+      version: process.env.VERSION || 'dev',
+      gitRef: process.env.GIT_REF || '',
+    },
   },
 
   compatibilityDate: '2025-02-14',
-})
+});

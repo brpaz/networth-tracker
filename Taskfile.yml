@@ -1,0 +1,169 @@
+version: '3'
+
+vars:
+  PROJECT_NAME: networth-tracker
+  GIT_REF:
+    sh: git rev-parse HEAD || echo "unknown"
+  GIT_REF_SHORT:
+    sh: git rev-parse --short HEAD || echo "unknown"
+  BUILD_DATE:
+    sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+  VERSION:
+    sh: git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0"
+  IMAGE_TAG: '{{.PROJECT_NAME}}:{{.VERSION}}-dev'
+tasks:
+  default:
+    desc: List all available tasks
+    cmds:
+      - task --list-all
+    silent: true
+
+  # Development tasks
+  deps:
+    desc: 'Installl project dependencies'
+    cmds:
+      - pnpm install
+
+  dev:
+    desc: Start development server
+    cmds:
+      - pnpm dev
+
+  build:
+    desc: Build Nuxt application for production
+    cmds:
+      - pnpm build
+
+  build:docker:
+    desc: Build Docker image for testing
+    cmds:
+      - |
+        docker buildx build \
+          --load \
+          --target production \
+          --build-arg GIT_REF={{.GIT_REF}} \
+          --build-arg BUILD_DATE={{.BUILD_DATE}} \
+          --build-arg VERSION={{.VERSION}} \
+          -t {{.IMAGE_TAG}} \
+          .
+
+  preview:
+    desc: Preview production build
+    cmds:
+      - pnpm preview
+
+  # Linting and formatting
+  lint:
+    desc: Run ESLint
+    cmds:
+      - pnpm lint
+
+  lint:fix:
+    desc: Run ESLint with auto-fix
+    cmds:
+      - pnpm lint:fix
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - pnpm format
+
+  format:check:
+    desc: Check Prettier formatting
+    cmds:
+      - pnpm format:check
+
+  # Testing
+  test:
+    desc: Run unit tests
+    cmds:
+      - pnpm test
+
+  test:watch:
+    desc: Run unit tests in watch mode
+    cmds:
+      - pnpm test:watch
+
+  test:e2e:
+    desc: Run end-to-end tests
+    cmds:
+      - pnpm test:e2e
+
+  # Database
+  db:generate:
+    desc: Generate database migrations
+    cmds:
+      - pnpm db:generate
+
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - pnpm db:migrate
+
+  db:studio:
+    desc: Open Drizzle Studio
+    cmds:
+      - pnpm db:studio
+
+  up:
+    desc: Start application with compose
+    cmds:
+      - docker compose up -d
+
+  down:
+    desc: Stop and remove compose containers
+    cmds:
+      - docker compose down
+
+  logs:
+    desc: View compose logs
+    cmds:
+      - docker compose logs -f app
+
+  restart:
+    desc: Restart compose containers
+    cmds:
+      - docker compose restart
+
+  migrate:
+    desc: Run database migrations in compose
+    cmds:
+      - docker compose run --rm migrations
+
+  # CI/CD tasks
+  ci:lint:
+    desc: Run linting checks
+    cmds:
+      - task: lint
+      - task: format:check
+
+  ci:test:
+    desc: Run all tests
+    cmds:
+      - task: test
+      - task: test:e2e
+
+  ci:smoke:
+    desc: Run smoke tests against Docker image
+    deps:
+      - build:docker
+    cmds:
+      - IMAGE_REF={{ .IMAGE_TAG }} ./scripts/ci/smoke-tests.sh
+
+  ci:
+    desc: Run full CI pipeline locally
+    cmds:
+      - task: ci:lint
+      - task: ci:test
+      - task: ci:smoke
+
+  # Utility tasks
+  install:
+    desc: Install dependencies
+    cmds:
+      - task: deps
+
+  clean:
+    desc: Clean build artifacts and containers
+    cmds:
+      - rm -rf .output dist node_modules

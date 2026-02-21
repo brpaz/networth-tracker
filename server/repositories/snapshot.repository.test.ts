@@ -1,126 +1,168 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-const mockReturning = vi.fn()
-const mockLimit = vi.fn()
-const mockOrderBy = vi.fn(() => ({ limit: mockLimit }))
-const mockWhere = vi.fn(() => ({
-  orderBy: mockOrderBy,
-  limit: mockLimit,
-  returning: mockReturning,
-}))
-const mockFrom = vi.fn(() => ({ where: mockWhere }))
-const mockValues = vi.fn(() => ({ returning: mockReturning }))
-
-const mockDb = {
-  select: vi.fn(() => ({ from: mockFrom })),
-  insert: vi.fn(() => ({ values: mockValues })),
-  delete: vi.fn(() => ({ where: mockWhere })),
-}
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
+import { createTestDatabase, closeTestDatabase, getTestDatabase } from '../test/setup-db';
 
 vi.mock('../database', () => ({
-  useDatabase: () => mockDb,
-}))
+  useDatabase: () => getTestDatabase(),
+}));
 
-import { useSnapshotRepository } from './snapshot.repository'
+import { useSnapshotRepository } from './snapshot.repository';
+import { accounts, accountSnapshots } from '../database/schema';
 
 beforeEach(() => {
-  vi.clearAllMocks()
-})
+  createTestDatabase();
+});
+
+afterAll(() => {
+  closeTestDatabase();
+});
+
+function insertAccount(overrides: Partial<{ name: string; type: string; currency: string }> = {}) {
+  const db = getTestDatabase();
+  const [account] = db
+    .insert(accounts)
+    .values({ name: 'Test Account', type: 'cash', currency: 'EUR', ...overrides })
+    .returning()
+    .all();
+  return account;
+}
 
 describe('useSnapshotRepository', () => {
-  const repo = useSnapshotRepository()
+  let repo: ReturnType<typeof useSnapshotRepository>;
+
+  beforeEach(() => {
+    repo = useSnapshotRepository();
+  });
 
   describe('create', () => {
     it('inserts and returns the new snapshot', async () => {
-      const newSnapshot = { id: 1, accountId: 1, value: 5000, recordedAt: new Date() }
-      mockReturning.mockResolvedValueOnce([newSnapshot])
+      const account = insertAccount();
 
-      const result = await repo.create({ accountId: 1, value: 5000 })
+      const result = await repo.create({ accountId: account.id, value: 5000 });
 
-      expect(mockDb.insert).toHaveBeenCalled()
-      expect(mockValues).toHaveBeenCalledWith({ accountId: 1, value: 5000 })
-      expect(result).toEqual(newSnapshot)
-    })
-  })
+      expect(result.id).toBeDefined();
+      expect(result.accountId).toBe(account.id);
+      expect(result.value).toBe(5000);
+      expect(result.recordedAt).toBeDefined();
+    });
+
+    it('auto-increments id', async () => {
+      const account = insertAccount();
+
+      const first = await repo.create({ accountId: account.id, value: 1000 });
+      const second = await repo.create({ accountId: account.id, value: 2000 });
+
+      expect(second.id).toBeGreaterThan(first.id);
+    });
+  });
 
   describe('findById', () => {
     it('returns snapshot when found', async () => {
-      const snapshot = { id: 1, accountId: 1, value: 5000, recordedAt: new Date() }
-      mockLimit.mockResolvedValueOnce([snapshot])
+      const account = insertAccount();
+      const created = await repo.create({ accountId: account.id, value: 5000 });
 
-      const result = await repo.findById(1)
+      const result = await repo.findById(created.id);
 
-      expect(mockDb.select).toHaveBeenCalled()
-      expect(mockFrom).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-      expect(mockLimit).toHaveBeenCalledWith(1)
-      expect(result).toEqual(snapshot)
-    })
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(created.id);
+      expect(result!.value).toBe(5000);
+      expect(result!.accountId).toBe(account.id);
+    });
 
     it('returns undefined when snapshot does not exist', async () => {
-      mockLimit.mockResolvedValueOnce([])
-
-      const result = await repo.findById(999)
-
-      expect(result).toBeUndefined()
-    })
-  })
+      const result = await repo.findById(999);
+      expect(result).toBeUndefined();
+    });
+  });
 
   describe('findByAccountId', () => {
-    it('returns snapshots ordered by date desc', async () => {
-      const snapshots = [
-        { id: 3, accountId: 1, value: 3000, recordedAt: new Date() },
-        { id: 2, accountId: 1, value: 2000, recordedAt: new Date() },
-        { id: 1, accountId: 1, value: 1000, recordedAt: new Date() },
-      ]
-      mockLimit.mockResolvedValueOnce(snapshots)
+    it('returns snapshots ordered by recordedAt desc', async () => {
+      const db = getTestDatabase();
+      const account = insertAccount();
 
-      const result = await repo.findByAccountId(1)
+      db.insert(accountSnapshots)
+        .values({ accountId: account.id, value: 1000, recordedAt: new Date(1000000) })
+        .run();
+      db.insert(accountSnapshots)
+        .values({ accountId: account.id, value: 3000, recordedAt: new Date(3000000) })
+        .run();
+      db.insert(accountSnapshots)
+        .values({ accountId: account.id, value: 2000, recordedAt: new Date(2000000) })
+        .run();
 
-      expect(mockDb.select).toHaveBeenCalled()
-      expect(mockFrom).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-      expect(mockOrderBy).toHaveBeenCalled()
-      expect(mockLimit).toHaveBeenCalledWith(100)
-      expect(result).toEqual(snapshots)
-    })
+      const result = await repo.findByAccountId(account.id);
+
+      expect(result).toHaveLength(3);
+      expect(result[0].value).toBe(3000);
+      expect(result[1].value).toBe(2000);
+      expect(result[2].value).toBe(1000);
+    });
 
     it('respects custom limit parameter', async () => {
-      mockLimit.mockResolvedValueOnce([])
+      const account = insertAccount();
+      await repo.create({ accountId: account.id, value: 1000 });
+      await repo.create({ accountId: account.id, value: 2000 });
+      await repo.create({ accountId: account.id, value: 3000 });
 
-      await repo.findByAccountId(1, 5)
+      const result = await repo.findByAccountId(account.id, 2);
 
-      expect(mockLimit).toHaveBeenCalledWith(5)
-    })
+      expect(result).toHaveLength(2);
+    });
+
+    it('defaults to limit of 100', async () => {
+      const account = insertAccount();
+      await repo.create({ accountId: account.id, value: 1000 });
+
+      const result = await repo.findByAccountId(account.id);
+
+      expect(result).toHaveLength(1);
+    });
 
     it('returns empty array when no snapshots exist', async () => {
-      mockLimit.mockResolvedValueOnce([])
+      const account = insertAccount();
 
-      const result = await repo.findByAccountId(1)
+      const result = await repo.findByAccountId(account.id);
 
-      expect(result).toEqual([])
-    })
-  })
+      expect(result).toEqual([]);
+    });
+
+    it('only returns snapshots for the specified account', async () => {
+      const account1 = insertAccount({ name: 'Account 1' });
+      const account2 = insertAccount({ name: 'Account 2' });
+      await repo.create({ accountId: account1.id, value: 1000 });
+      await repo.create({ accountId: account2.id, value: 2000 });
+
+      const result = await repo.findByAccountId(account1.id);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].accountId).toBe(account1.id);
+    });
+  });
 
   describe('deleteById', () => {
     it('deletes and returns the snapshot', async () => {
-      const deleted = { id: 1, accountId: 1, value: 5000, recordedAt: new Date() }
-      mockReturning.mockResolvedValueOnce([deleted])
+      const account = insertAccount();
+      const created = await repo.create({ accountId: account.id, value: 5000 });
 
-      const result = await repo.deleteById(1)
+      const result = await repo.deleteById(created.id);
 
-      expect(mockDb.delete).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-      expect(mockReturning).toHaveBeenCalled()
-      expect(result).toEqual(deleted)
-    })
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(created.id);
+      expect(result!.value).toBe(5000);
+    });
 
     it('returns undefined when snapshot does not exist', async () => {
-      mockReturning.mockResolvedValueOnce([])
+      const result = await repo.deleteById(999);
+      expect(result).toBeUndefined();
+    });
 
-      const result = await repo.deleteById(999)
+    it('actually removes the snapshot from database', async () => {
+      const account = insertAccount();
+      const created = await repo.create({ accountId: account.id, value: 5000 });
 
-      expect(result).toBeUndefined()
-    })
-  })
-})
+      await repo.deleteById(created.id);
+
+      const found = await repo.findById(created.id);
+      expect(found).toBeUndefined();
+    });
+  });
+});

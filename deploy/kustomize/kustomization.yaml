@@ -1,7 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: networth-tracker
+images:
+  - name: ghcr.io/brpaz/networth-tracker
+    newTag: ${IMAGE_TAG}
 
 resources:
   - namespace.yaml

@@ -1,122 +1,180 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-const mockGet = vi.fn()
-const mockReturning = vi.fn()
-const mockLimit = vi.fn(() => Promise.resolve([]))
-const mockOrderBy = vi.fn(() => ({ limit: mockLimit }))
-const mockWhere = vi.fn(() => ({
-  get: mockGet,
-  returning: mockReturning,
-  orderBy: mockOrderBy,
-}))
-const mockFrom = vi.fn(() => ({ orderBy: mockOrderBy, where: mockWhere }))
-const mockValues = vi.fn(() => ({ returning: mockReturning }))
-const mockSet = vi.fn(() => ({ where: mockWhere }))
-
-const mockDb = {
-  select: vi.fn(() => ({ from: mockFrom })),
-  insert: vi.fn(() => ({ values: mockValues })),
-  update: vi.fn(() => ({ set: mockSet })),
-  delete: vi.fn(() => ({ where: mockWhere })),
-}
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
+import { createTestDatabase, closeTestDatabase, getTestDatabase } from '../test/setup-db';
 
 vi.mock('../database', () => ({
-  useDatabase: () => mockDb,
-}))
+  useDatabase: () => getTestDatabase(),
+}));
 
-import { useAccountRepository } from './account.repository'
+import { useAccountRepository } from './account.repository';
+import { accounts, accountSnapshots } from '../database/schema';
 
 beforeEach(() => {
-  vi.clearAllMocks()
-})
+  createTestDatabase();
+});
+
+afterAll(() => {
+  closeTestDatabase();
+});
 
 describe('useAccountRepository', () => {
-  const repo = useAccountRepository()
+  let repo: ReturnType<typeof useAccountRepository>;
+
+  beforeEach(() => {
+    repo = useAccountRepository();
+  });
 
   describe('findAll', () => {
-    it('queries accounts ordered by updatedAt', async () => {
-      const fakeAccounts = [
-        { id: 1, name: 'Savings', type: 'cash', currency: 'EUR', currentValue: 1000 },
-      ]
-      mockOrderBy.mockResolvedValueOnce(fakeAccounts)
+    it('returns empty array when no accounts exist', async () => {
+      const result = await repo.findAll();
+      expect(result).toEqual([]);
+    });
 
-      const result = await repo.findAll()
+    it('returns accounts ordered by updatedAt desc', async () => {
+      const db = getTestDatabase();
+      const past = new Date(Date.now() - 60000);
+      const now = new Date();
+      db.insert(accounts)
+        .values({ name: 'Older', type: 'cash', currency: 'EUR', updatedAt: past })
+        .run();
+      db.insert(accounts)
+        .values({ name: 'Newer', type: 'stocks', currency: 'USD', updatedAt: now })
+        .run();
 
-      expect(mockDb.select).toHaveBeenCalled()
-      expect(mockFrom).toHaveBeenCalled()
-      expect(result).toEqual(fakeAccounts)
-    })
-  })
+      const result = await repo.findAll();
+
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe('Newer');
+      expect(result[1].name).toBe('Older');
+    });
+
+    it('includes currentValue from latest snapshot', async () => {
+      const db = getTestDatabase();
+      const [account] = db
+        .insert(accounts)
+        .values({ name: 'Savings', type: 'cash', currency: 'EUR' })
+        .returning()
+        .all();
+      const earlier = new Date(Date.now() - 60000);
+      const later = new Date();
+      db.insert(accountSnapshots)
+        .values({ accountId: account.id, value: 1000, recordedAt: earlier })
+        .run();
+      db.insert(accountSnapshots)
+        .values({ accountId: account.id, value: 2000, recordedAt: later })
+        .run();
+
+      const result = await repo.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].currentValue).toBe(2000);
+    });
+
+    it('returns null currentValue when no snapshots exist', async () => {
+      const db = getTestDatabase();
+      db.insert(accounts).values({ name: 'Empty', type: 'cash', currency: 'EUR' }).run();
+
+      const result = await repo.findAll();
+
+      expect(result[0].currentValue).toBeNull();
+    });
+  });
 
   describe('findById', () => {
     it('returns account when found', async () => {
-      const fakeAccount = { id: 1, name: 'Stocks', type: 'stocks', currency: 'USD' }
-      mockGet.mockResolvedValueOnce(fakeAccount)
+      const db = getTestDatabase();
+      const [created] = db
+        .insert(accounts)
+        .values({ name: 'Stocks', type: 'stocks', currency: 'USD' })
+        .returning()
+        .all();
 
-      const result = await repo.findById(1)
+      const result = await repo.findById(created.id);
 
-      expect(mockDb.select).toHaveBeenCalled()
-      expect(mockFrom).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-      expect(result).toEqual(fakeAccount)
-    })
+      expect(result).toBeDefined();
+      expect(result!.name).toBe('Stocks');
+      expect(result!.type).toBe('stocks');
+      expect(result!.currency).toBe('USD');
+    });
 
     it('returns undefined for non-existent account', async () => {
-      mockGet.mockResolvedValueOnce(undefined)
-
-      const result = await repo.findById(999)
-
-      expect(result).toBeUndefined()
-    })
-  })
+      const result = await repo.findById(999);
+      expect(result).toBeUndefined();
+    });
+  });
 
   describe('create', () => {
     it('inserts and returns the new account', async () => {
-      const newAccount = { id: 1, name: 'Savings', type: 'cash', currency: 'EUR' }
-      mockReturning.mockResolvedValueOnce([newAccount])
+      const result = await repo.create({ name: 'Savings', type: 'cash', currency: 'EUR' });
 
-      const result = await repo.create({ name: 'Savings', type: 'cash', currency: 'EUR' })
+      expect(result.id).toBeDefined();
+      expect(result.name).toBe('Savings');
+      expect(result.type).toBe('cash');
+      expect(result.currency).toBe('EUR');
+      expect(result.createdAt).toBeDefined();
+      expect(result.updatedAt).toBeDefined();
+    });
 
-      expect(mockDb.insert).toHaveBeenCalled()
-      expect(mockValues).toHaveBeenCalledWith({ name: 'Savings', type: 'cash', currency: 'EUR' })
-      expect(result).toEqual(newAccount)
-    })
-  })
+    it('auto-increments id', async () => {
+      const first = await repo.create({ name: 'First', type: 'cash', currency: 'EUR' });
+      const second = await repo.create({ name: 'Second', type: 'stocks', currency: 'USD' });
+
+      expect(second.id).toBeGreaterThan(first.id);
+    });
+  });
 
   describe('update', () => {
     it('updates and returns the account', async () => {
-      const updated = { id: 1, name: 'New Name', type: 'cash', currency: 'EUR' }
-      mockReturning.mockResolvedValueOnce([updated])
+      const created = await repo.create({ name: 'Old Name', type: 'cash', currency: 'EUR' });
 
-      const result = await repo.update(1, { name: 'New Name' })
+      const result = await repo.update(created.id, { name: 'New Name' });
 
-      expect(mockDb.update).toHaveBeenCalled()
-      expect(mockSet).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-      expect(result).toEqual(updated)
-    })
-  })
+      expect(result.id).toBe(created.id);
+      expect(result.name).toBe('New Name');
+      expect(result.type).toBe('cash');
+    });
+
+    it('updates only specified fields', async () => {
+      const created = await repo.create({ name: 'Test', type: 'cash', currency: 'EUR' });
+
+      const result = await repo.update(created.id, { currency: 'USD' });
+
+      expect(result.name).toBe('Test');
+      expect(result.currency).toBe('USD');
+    });
+  });
 
   describe('delete', () => {
     it('deletes the account by id', async () => {
-      mockWhere.mockResolvedValueOnce(undefined)
+      const created = await repo.create({ name: 'ToDelete', type: 'cash', currency: 'EUR' });
 
-      await repo.delete(1)
+      await repo.delete(created.id);
 
-      expect(mockDb.delete).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-    })
-  })
+      const found = await repo.findById(created.id);
+      expect(found).toBeUndefined();
+    });
+
+    it('cascades deletion to snapshots', async () => {
+      const db = getTestDatabase();
+      const created = await repo.create({ name: 'WithSnapshots', type: 'cash', currency: 'EUR' });
+      db.insert(accountSnapshots).values({ accountId: created.id, value: 1000 }).run();
+
+      await repo.delete(created.id);
+
+      const snapshots = db.select().from(accountSnapshots).all();
+      expect(snapshots).toHaveLength(0);
+    });
+  });
 
   describe('touchUpdatedAt', () => {
     it('updates the updatedAt timestamp', async () => {
-      mockWhere.mockResolvedValueOnce(undefined)
+      const created = await repo.create({ name: 'Touch', type: 'cash', currency: 'EUR' });
+      const originalUpdatedAt = created.updatedAt;
 
-      await repo.touchUpdatedAt(1)
+      await new Promise((r) => setTimeout(r, 1100));
+      await repo.touchUpdatedAt(created.id);
 
-      expect(mockDb.update).toHaveBeenCalled()
-      expect(mockSet).toHaveBeenCalled()
-      expect(mockWhere).toHaveBeenCalled()
-    })
-  })
-})
+      const updated = await repo.findById(created.id);
+      expect(updated!.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
+    });
+  });
+});

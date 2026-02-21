@@ -1,10 +1,15 @@
-node_modules
-.nuxt
-.output
-.git
-*.md
-tests
-.github
-deploy
-devenv*
-.devenv
+# Deny all by default
+*
+
+# Allow only what's needed for build
+!package.json
+!pnpm-lock.yaml
+!.npmrc
+!app/
+!server/
+!shared/
+!nuxt.config.ts
+!tsconfig.json
+!.nuxtrc
+!drizzle.config.ts
+!deploy/docker/docker-entrypoint.sh

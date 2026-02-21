@@ -1,35 +1,47 @@
 <script setup lang="ts">
-import type { Account } from '~/types'
+import type { Account } from '~/types';
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'default' });
 
-const initialAmount = ref(10000)
-const yearlyRate = ref(7)
-const years = ref(20)
+const initialAmount = ref(10000);
+const yearlyRate = ref(7);
+const years = ref(20);
+const inflationRate = ref(2);
+const adjustForInflation = ref(false);
+const capitalGainsTaxRate = ref(14);
+const adjustForCapitalGainsTax = ref(false);
 
-const { data: accounts } = await useFetch<Account[]>('/api/accounts')
+const { data: accounts } = await useFetch<Account[]>('/api/accounts');
 if (accounts.value) {
-  const total = accounts.value.reduce((sum, a) => sum + (a.currentValue || 0), 0)
+  const total = accounts.value.reduce((sum, a) => sum + (a.currentValue || 0), 0);
   if (total > 0) {
-    initialAmount.value = total
+    initialAmount.value = total;
   }
 }
 
 const simulationData = computed(() => {
-  const data = []
-  let current = initialAmount.value
+  const data = [];
+  let current = initialAmount.value;
+  const effectiveRate = adjustForInflation.value
+    ? yearlyRate.value - inflationRate.value
+    : yearlyRate.value;
+  const cgtMultiplier = adjustForCapitalGainsTax.value ? 1 - capitalGainsTaxRate.value / 100 : 1;
+
   for (let i = 0; i <= years.value; i++) {
     data.push({
       year: i,
       value: Math.round(current * 100) / 100,
-    })
-    current *= 1 + yearlyRate.value / 100
+    });
+    const yearlyGains = current * (effectiveRate / 100);
+    current += yearlyGains * cgtMultiplier;
   }
-  return data
-})
+  return data;
+});
 
-const finalValue = computed(() => simulationData.value[simulationData.value.length - 1]?.value || 0)
-const totalGrowth = computed(() => finalValue.value - initialAmount.value)
+const finalValue = computed(
+  () => simulationData.value[simulationData.value.length - 1]?.value || 0,
+);
+const totalGrowth = computed(() => finalValue.value - initialAmount.value);
 </script>
 
 <template>
@@ -48,6 +60,17 @@ const totalGrowth = computed(() => finalValue.value - initialAmount.value)
         </UFormField>
         <UFormField label="Time (years)">
           <UInputNumber v-model="years" :min="1" :max="50" />
+        </UFormField>
+      </div>
+
+      <div class="mb-6 space-y-3">
+        <UCheckbox v-model="adjustForInflation" label="Adjust for inflation" />
+        <UFormField v-if="adjustForInflation" label="Inflation Rate (%)">
+          <UInputNumber v-model="inflationRate" :min="0" :max="100" :step="0.5" />
+        </UFormField>
+        <UCheckbox v-model="adjustForCapitalGainsTax" label="Adjust for capital gains tax" />
+        <UFormField v-if="adjustForCapitalGainsTax" label="Capital Gains Tax Rate (%)">
+          <UInputNumber v-model="capitalGainsTaxRate" :min="0" :max="100" :step="0.5" />
         </UFormField>
       </div>
 

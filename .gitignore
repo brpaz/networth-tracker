@@ -5,6 +5,7 @@ dist
 
 # Node
 node_modules
+.pnpm-store
 
 # Environment
 .env
@@ -22,6 +23,11 @@ devenv.lock
 
 # IDE
 .vscode
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
 .idea
 *.swp
 *.swo
@@ -32,3 +38,18 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Test reports
+reports/
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# Temporary files
+*.tmp
+*.tmp.*

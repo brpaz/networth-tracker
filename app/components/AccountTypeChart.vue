@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Doughnut } from 'vue-chartjs'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Doughnut } from 'vue-chartjs';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const props = defineProps<{
-  data: Array<{ type: string; total: number }> | null
-}>()
+  data: Array<{ type: string; total: number }> | null;
+}>();
 
 const colors = [
   'rgb(147, 51, 234)',
@@ -15,7 +15,7 @@ const colors = [
   'rgb(245, 158, 11)',
   'rgb(239, 68, 68)',
   'rgb(107, 114, 128)',
-]
+];
 
 const chartData = computed(() => ({
   labels: (props.data || []).map((d) => d.type),
@@ -25,7 +25,7 @@ const chartData = computed(() => ({
       backgroundColor: colors.slice(0, (props.data || []).length),
     },
   ],
-}))
+}));
 
 const chartOptions = {
   responsive: true,
@@ -35,7 +35,7 @@ const chartOptions = {
       position: 'bottom' as const,
     },
   },
-}
+};
 </script>
 
 <template>

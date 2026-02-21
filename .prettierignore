@@ -3,3 +3,6 @@ dist
 .output
 .nuxt
 node_modules
+reports
+test-results
+coverage

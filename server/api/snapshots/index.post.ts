@@ -1,13 +1,19 @@
-import { useSnapshotService } from '../../services/snapshot.service'
-import { createSnapshotSchema } from '../../utils/validation'
+import { z } from 'zod';
+import { useSnapshotService } from '../../services/snapshot.service';
+import { defineApiHandler } from '../../handlers';
 
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-  const data = createSnapshotSchema.parse(body)
+const createSnapshotSchema = z.object({
+  accountId: z.number().int().positive(),
+  value: z.number(),
+});
 
-  const service = useSnapshotService()
-  const snapshot = await service.recordSnapshot(data)
+export default defineApiHandler(async (event) => {
+  const body = await readBody(event);
+  const data = createSnapshotSchema.parse(body);
 
-  setResponseStatus(event, 201)
-  return snapshot
-})
+  const service = useSnapshotService();
+  const snapshot = await service.recordSnapshot(data);
+
+  setResponseStatus(event, 201);
+  return snapshot;
+});

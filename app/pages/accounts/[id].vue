@@ -1,32 +1,34 @@
 <script setup lang="ts">
-import type { Account, Snapshot } from '~/types'
+import type { Account, Snapshot } from '~/types';
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'default' });
 
-const route = useRoute()
-const toast = useToast()
-const { formatCurrency, formatDate } = useFormatters()
-const accountId = Number(route.params.id)
+const route = useRoute();
+const toast = useToast();
+const { formatCurrency, formatDate } = useFormatters();
+const accountId = Number(route.params.id);
 
-const { data: account, error: accountError } = await useFetch<Account>(`/api/accounts/${accountId}`)
+const { data: account, error: accountError } = await useFetch<Account>(
+  `/api/accounts/${accountId}`,
+);
 
 if (accountError.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Account not found' })
+  throw createError({ statusCode: 404, statusMessage: 'Account not found' });
 }
 
 const {
   data: snapshots,
   refresh: refreshSnapshots,
   status,
-} = await useFetch<Snapshot[]>(`/api/accounts/${accountId}/snapshots`)
+} = await useFetch<Snapshot[]>(`/api/accounts/${accountId}/snapshots`);
 
 async function deleteSnapshot(snapshotId: number) {
   try {
-    await $fetch(`/api/snapshots/${snapshotId}`, { method: 'DELETE' })
-    toast.add({ title: 'Snapshot removed', color: 'success' })
-    await refreshSnapshots()
+    await $fetch(`/api/snapshots/${snapshotId}`, { method: 'DELETE' });
+    toast.add({ title: 'Snapshot removed', color: 'success' });
+    await refreshSnapshots();
   } catch {
-    toast.add({ title: 'Error removing snapshot', color: 'error' })
+    toast.add({ title: 'Error removing snapshot', color: 'error' });
   }
 }
 </script>

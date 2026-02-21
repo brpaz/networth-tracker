@@ -1,0 +1,22 @@
+services:
+  app:
+    image: ${IMAGE_REF}
+    ports:
+      - '${CI_PORT:-3001}:3000'
+    environment:
+      DATABASE_URL: /app/data/networth.db
+      NODE_ENV: production
+    volumes:
+      - networth-data:/app/data
+    networks:
+      - networth-tracker-ci
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+networks:
+  networth-tracker-ci:
+volumes:
+  networth-data:

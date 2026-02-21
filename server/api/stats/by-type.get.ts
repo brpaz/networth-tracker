@@ -1,6 +1,6 @@
-import { useStatsService } from '../../services/stats.service'
+import { useStatsService } from '../../services/stats.service';
 
 export default defineEventHandler(async () => {
-  const service = useStatsService()
-  return service.getByType()
-})
+  const service = useStatsService();
+  return service.getByType();
+});

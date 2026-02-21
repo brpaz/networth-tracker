@@ -1,9 +1,9 @@
-import { sql } from 'drizzle-orm'
-import { useDatabase } from '../database'
-import { accounts, accountSnapshots } from '../database/schema'
+import { sql } from 'drizzle-orm';
+import { useDatabase } from '../database';
+import { accounts, accountSnapshots } from '../database/schema';
 
 export function useStatsService() {
-  const db = useDatabase()
+  const db = useDatabase();
 
   return {
     async getNetWorthHistory(days = 365) {
@@ -25,7 +25,7 @@ export function useStatsService() {
         WHERE rn = 1
         GROUP BY date
         ORDER BY date ASC
-      `)
+      `);
     },
 
     async getByType() {
@@ -45,7 +45,7 @@ export function useStatsService() {
           FROM ${accountSnapshots}
         ) latest ON latest.account_id = ${accounts.id} AND latest.rn = 1
         GROUP BY ${accounts.type}
-      `)
+      `);
     },
-  }
+  };
 }

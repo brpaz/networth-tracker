@@ -1,102 +1,145 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createError } from 'h3'
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
+import { createTestDatabase, closeTestDatabase, getTestDatabase } from '../test/setup-db';
+import { NotFoundError } from '../errors';
 
-vi.stubGlobal('createError', createError)
+vi.mock('../database', () => ({
+  useDatabase: () => getTestDatabase(),
+}));
 
-const mockRepo = {
-  findAll: vi.fn(),
-  findById: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-  touchUpdatedAt: vi.fn(),
-}
+import { useAccountService } from './account.service';
+import { accounts, accountSnapshots } from '../database/schema';
 
-vi.mock('../repositories/account.repository', () => ({
-  useAccountRepository: () => mockRepo,
-}))
+beforeEach(() => {
+  createTestDatabase();
+});
 
-import { useAccountService } from './account.service'
+afterAll(() => {
+  closeTestDatabase();
+});
 
 describe('useAccountService', () => {
-  const service = useAccountService()
+  let service: ReturnType<typeof useAccountService>;
 
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    service = useAccountService();
+  });
 
-  it('listAccounts delegates to repo.findAll', async () => {
-    const accounts = [{ id: 1, name: 'Test' }]
-    mockRepo.findAll.mockResolvedValue(accounts)
+  describe('listAccounts', () => {
+    it('returns empty array when no accounts exist', async () => {
+      const result = await service.listAccounts();
+      expect(result).toEqual([]);
+    });
 
-    const result = await service.listAccounts()
+    it('returns all accounts with currentValue', async () => {
+      const db = getTestDatabase();
+      const [account] = db
+        .insert(accounts)
+        .values({ name: 'Savings', type: 'cash', currency: 'EUR' })
+        .returning()
+        .all();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 5000 }).run();
 
-    expect(mockRepo.findAll).toHaveBeenCalledOnce()
-    expect(result).toEqual(accounts)
-  })
+      const result = await service.listAccounts();
 
-  it('getAccount returns account when found', async () => {
-    const account = { id: 1, name: 'Test' }
-    mockRepo.findById.mockResolvedValue(account)
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('Savings');
+      expect(result[0].currentValue).toBe(5000);
+    });
+  });
 
-    const result = await service.getAccount(1)
+  describe('getAccount', () => {
+    it('returns account when found', async () => {
+      const db = getTestDatabase();
+      const [created] = db
+        .insert(accounts)
+        .values({ name: 'Stocks', type: 'stocks', currency: 'USD' })
+        .returning()
+        .all();
 
-    expect(mockRepo.findById).toHaveBeenCalledWith(1)
-    expect(result).toEqual(account)
-  })
+      const result = await service.getAccount(created.id);
 
-  it('getAccount throws 404 when not found', async () => {
-    mockRepo.findById.mockResolvedValue(undefined)
+      expect(result.name).toBe('Stocks');
+      expect(result.type).toBe('stocks');
+    });
 
-    await expect(service.getAccount(999)).rejects.toThrow()
-    expect(mockRepo.findById).toHaveBeenCalledWith(999)
-  })
+    it('throws NotFoundError when account not found', async () => {
+      await expect(service.getAccount(999)).rejects.toThrow(NotFoundError);
+    });
+  });
 
-  it('createAccount delegates to repo.create', async () => {
-    const data = { name: 'New', type: 'cash', currency: 'EUR' }
-    const created = { id: 1, ...data }
-    mockRepo.create.mockResolvedValue(created)
+  describe('createAccount', () => {
+    it('creates and returns the new account', async () => {
+      const result = await service.createAccount({
+        name: 'New Account',
+        type: 'cash',
+        currency: 'EUR',
+      });
 
-    const result = await service.createAccount(data)
+      expect(result.id).toBeDefined();
+      expect(result.name).toBe('New Account');
+      expect(result.type).toBe('cash');
+      expect(result.currency).toBe('EUR');
+    });
 
-    expect(mockRepo.create).toHaveBeenCalledWith(data)
-    expect(result).toEqual(created)
-  })
+    it('persists to the database', async () => {
+      const created = await service.createAccount({
+        name: 'Persisted',
+        type: 'stocks',
+        currency: 'USD',
+      });
 
-  it('updateAccount verifies existence then updates', async () => {
-    const account = { id: 1, name: 'Old' }
-    mockRepo.findById.mockResolvedValue(account)
-    mockRepo.update.mockResolvedValue({ ...account, name: 'New' })
+      const found = await service.getAccount(created.id);
+      expect(found.name).toBe('Persisted');
+    });
+  });
 
-    const result = await service.updateAccount(1, { name: 'New' })
+  describe('updateAccount', () => {
+    it('updates and returns the account', async () => {
+      const created = await service.createAccount({
+        name: 'Old Name',
+        type: 'cash',
+        currency: 'EUR',
+      });
 
-    expect(mockRepo.findById).toHaveBeenCalledWith(1)
-    expect(mockRepo.update).toHaveBeenCalledWith(1, { name: 'New' })
-    expect(result.name).toBe('New')
-  })
+      const result = await service.updateAccount(created.id, { name: 'New Name' });
 
-  it('updateAccount throws 404 for non-existent account', async () => {
-    mockRepo.findById.mockResolvedValue(undefined)
+      expect(result.name).toBe('New Name');
+      expect(result.type).toBe('cash');
+    });
 
-    await expect(service.updateAccount(999, { name: 'X' })).rejects.toThrow()
-    expect(mockRepo.update).not.toHaveBeenCalled()
-  })
+    it('updates only specified fields', async () => {
+      const created = await service.createAccount({
+        name: 'Test',
+        type: 'cash',
+        currency: 'EUR',
+      });
 
-  it('deleteAccount verifies existence then deletes', async () => {
-    const account = { id: 1, name: 'ToDelete' }
-    mockRepo.findById.mockResolvedValue(account)
-    mockRepo.delete.mockResolvedValue(undefined)
+      const result = await service.updateAccount(created.id, { currency: 'USD' });
 
-    await service.deleteAccount(1)
+      expect(result.name).toBe('Test');
+      expect(result.currency).toBe('USD');
+    });
 
-    expect(mockRepo.findById).toHaveBeenCalledWith(1)
-    expect(mockRepo.delete).toHaveBeenCalledWith(1)
-  })
+    it('throws NotFoundError for non-existent account', async () => {
+      await expect(service.updateAccount(999, { name: 'X' })).rejects.toThrow(NotFoundError);
+    });
+  });
 
-  it('deleteAccount throws 404 for non-existent account', async () => {
-    mockRepo.findById.mockResolvedValue(undefined)
+  describe('deleteAccount', () => {
+    it('deletes the account', async () => {
+      const created = await service.createAccount({
+        name: 'ToDelete',
+        type: 'cash',
+        currency: 'EUR',
+      });
 
-    await expect(service.deleteAccount(999)).rejects.toThrow()
-    expect(mockRepo.delete).not.toHaveBeenCalled()
-  })
-})
+      await service.deleteAccount(created.id);
+
+      await expect(service.getAccount(created.id)).rejects.toThrow(NotFoundError);
+    });
+
+    it('throws NotFoundError for non-existent account', async () => {
+      await expect(service.deleteAccount(999)).rejects.toThrow(NotFoundError);
+    });
+  });
+});

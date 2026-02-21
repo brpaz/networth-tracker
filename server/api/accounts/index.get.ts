@@ -1,6 +1,6 @@
-import { useAccountService } from '../../services/account.service'
+import { useAccountService } from '../../services/account.service';
 
 export default defineEventHandler(async () => {
-  const service = useAccountService()
-  return service.listAccounts()
-})
+  const service = useAccountService();
+  return service.listAccounts();
+});

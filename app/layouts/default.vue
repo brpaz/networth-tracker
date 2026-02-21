@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem } from '@nuxt/ui';
 
-const colorMode = useColorMode()
+const colorMode = useColorMode();
 
 const items: NavigationMenuItem[] = [
   {
@@ -19,15 +19,15 @@ const items: NavigationMenuItem[] = [
     icon: 'i-lucide-trending-up',
     to: '/simulator',
   },
-]
+];
 
 function toggleColorMode() {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
 }
 
 const colorModeIcon = computed(() =>
   colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-)
+);
 </script>
 
 <template>
@@ -72,6 +72,7 @@ const colorModeIcon = computed(() =>
       <main class="flex-1 overflow-y-auto">
         <slot />
       </main>
+      <AppFooter />
     </div>
   </div>
 </template>

@@ -1,9 +1,9 @@
-import { desc, eq, sql } from 'drizzle-orm'
-import { useDatabase } from '../database'
-import { accounts } from '../database/schema'
+import { desc, eq, sql } from 'drizzle-orm';
+import { useDatabase } from '../database';
+import { accounts } from '../database/schema';
 
 export function useAccountRepository() {
-  const db = useDatabase()
+  const db = useDatabase();
 
   return {
     async findAll() {
@@ -24,16 +24,16 @@ export function useAccountRepository() {
           )`.as('current_value'),
         })
         .from(accounts)
-        .orderBy(desc(accounts.updatedAt))
+        .orderBy(desc(accounts.updatedAt));
     },
 
     async findById(id: number) {
-      return db.select().from(accounts).where(eq(accounts.id, id)).get()
+      return db.select().from(accounts).where(eq(accounts.id, id)).get();
     },
 
     async create(data: { name: string; type: string; currency: string }) {
-      const [account] = await db.insert(accounts).values(data).returning()
-      return account
+      const [account] = await db.insert(accounts).values(data).returning();
+      return account;
     },
 
     async update(id: number, data: Partial<{ name: string; type: string; currency: string }>) {
@@ -41,19 +41,19 @@ export function useAccountRepository() {
         .update(accounts)
         .set({ ...data, updatedAt: sql`(unixepoch())` })
         .where(eq(accounts.id, id))
-        .returning()
-      return account
+        .returning();
+      return account;
     },
 
     async delete(id: number) {
-      await db.delete(accounts).where(eq(accounts.id, id))
+      await db.delete(accounts).where(eq(accounts.id, id));
     },
 
     async touchUpdatedAt(id: number) {
       await db
         .update(accounts)
         .set({ updatedAt: sql`(unixepoch())` })
-        .where(eq(accounts.id, id))
+        .where(eq(accounts.id, id));
     },
-  }
+  };
 }

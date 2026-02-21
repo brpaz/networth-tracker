@@ -1,11 +1,12 @@
-import { useAccountService } from '../../services/account.service'
+import { useAccountService } from '../../services/account.service';
+import { defineApiHandler } from '../../handlers';
 
-export default defineEventHandler(async (event) => {
-  const id = Number(getRouterParam(event, 'id'))
+export default defineApiHandler(async (event) => {
+  const id = Number(getRouterParam(event, 'id'));
   if (!id || isNaN(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid account ID' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid account ID' });
   }
 
-  const service = useAccountService()
-  return service.getAccount(id)
-})
+  const service = useAccountService();
+  return service.getAccount(id);
+});

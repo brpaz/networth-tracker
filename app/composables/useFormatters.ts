@@ -4,17 +4,17 @@ export function useFormatters() {
       style: 'currency',
       currency,
       minimumFractionDigits: 2,
-    }).format(value)
-  }
+    }).format(value);
+  };
 
   const formatDate = (value: number | string) => {
-    const date = typeof value === 'string' ? new Date(value) : new Date(value * 1000)
+    const date = typeof value === 'string' ? new Date(value) : new Date(value * 1000);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    })
-  }
+    });
+  };
 
-  return { formatCurrency, formatDate }
+  return { formatCurrency, formatDate };
 }

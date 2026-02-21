@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Line } from 'vue-chartjs'
+import { Line } from 'vue-chartjs';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   Filler,
   Legend,
-} from 'chart.js'
+} from 'chart.js';
 
 ChartJS.register(
   CategoryScale,
@@ -21,11 +21,11 @@ ChartJS.register(
   Tooltip,
   Filler,
   Legend,
-)
+);
 
 const props = defineProps<{
-  data: Array<{ date: string; total: number }> | null
-}>()
+  data: Array<{ date: string; total: number }> | null;
+}>();
 
 const chartData = computed(() => ({
   labels: (props.data || []).map((d) => d.date),
@@ -39,7 +39,7 @@ const chartData = computed(() => ({
       tension: 0.3,
     },
   ],
-}))
+}));
 
 const chartOptions = {
   responsive: true,
@@ -52,7 +52,7 @@ const chartOptions = {
       beginAtZero: false,
     },
   },
-}
+};
 </script>
 
 <template>
