@@ -70,6 +70,7 @@ jobs:
     needs: lint
     env:
       DATABASE_URL: file:${{ github.workspace }}/data/networth.db
+      NUXT_DATABASE_URL: file:${{ github.workspace }}/data/networth.db
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
