@@ -89,7 +89,9 @@ jobs:
         run: mkdir -p data && pnpm run db:migrate
 
       - name: Run End-to-End tests
-        run: npm run test:e2e
+        run: pnpm run test:e2e
+        env:
+          DATABASE_URL: file:./data/networth.db
 
       - name: Upload End-to-End test reports
         uses: actions/upload-artifact@v4
