@@ -13,9 +13,7 @@ node_modules
 .env.*.local
 
 # Data
-data/*.db
-data/*.db-journal
-data/*.db-wal
+data
 
 # Dev environment
 .devenv

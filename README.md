@@ -1,6 +1,12 @@
 # Net Worth Tracker
 
-> A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui). Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
+> A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui), with SQLite for data storage. Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
+
+## Screenshots
+
+| Dashboard                                      | Accounts                                     | Growth Simulator                               |
+| ---------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| ![Dashboard](./docs/screenshots/dashboard.png) | ![Accounts](./docs/screenshots/accounts.png) | ![Simulator](./docs/screenshots/simulator.png) |
 
 ## 🎯 Motivation
 
