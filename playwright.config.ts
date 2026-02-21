@@ -4,7 +4,7 @@ const port = parseInt(process.env.PORT ?? '3000', 10);
 
 export default defineConfig({
   testDir: './tests/e2e',
-  outputDir: './reports/e2e-results',
+  outputDir: './reports/e2e',
   webServer: {
     command: 'pnpm dev',
     port,
@@ -12,10 +12,13 @@ export default defineConfig({
   },
   use: {
     baseURL: `http://localhost:${port}`,
+    screenshot: 'on',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
   reporter: [
     ['list'],
     ['html', { outputFolder: 'reports/e2e' }],
-    ['junit', { outputFile: 'reports/e2e-results.xml' }],
+    ['junit', { outputFile: 'reports/e2e/playwright-results.xml' }],
   ],
 });

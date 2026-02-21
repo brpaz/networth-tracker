@@ -23,7 +23,7 @@
     "test:report": "npx vite preview --outDir reports/unit",
     "test:report:coverage": "npx vite preview --outDir reports/unit",
     "test:e2e": "playwright test",
-    "test:e2e:report": "npx playwright show-report",
+    "test:e2e:report": "pnpm exec playwright show-report reports/e2e",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"

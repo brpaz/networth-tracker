@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { mockDashboardApi } from './fixtures/dashboard';
+import { mockAccountsApi } from './fixtures/accounts';
 
 test.describe('Dashboard', () => {
   test('renders the dashboard page', async ({ page }) => {
+    await mockDashboardApi(page);
     await page.goto('/');
 
     await expect(page.getByText('Total Net Worth')).toBeVisible();
@@ -11,6 +14,7 @@ test.describe('Dashboard', () => {
   });
 
   test('shows navigation sidebar', async ({ page }) => {
+    await mockDashboardApi(page);
     await page.goto('/');
 
     await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
@@ -19,6 +23,8 @@ test.describe('Dashboard', () => {
   });
 
   test('navigates to accounts page', async ({ page }) => {
+    await mockDashboardApi(page);
+    await mockAccountsApi(page);
     await page.goto('/');
 
     await page.getByRole('link', { name: 'Accounts' }).click();
@@ -27,6 +33,7 @@ test.describe('Dashboard', () => {
   });
 
   test('navigates to simulator page', async ({ page }) => {
+    await mockDashboardApi(page);
     await page.goto('/');
 
     await page.getByRole('link', { name: 'Simulator' }).click();
