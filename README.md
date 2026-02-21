@@ -1,19 +1,16 @@
 # Net Worth Tracker
 
-[![License](https://img.shields.io/badge/LICENSE-MIT-informational?style=for-the-badge)](./LICENSE.md)
+> A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui), with SQLite for data storage. Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
+
+<p align="center">
+
 [![CI](https://img.shields.io/github/actions/workflow/status/brpaz/networth-tracker/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/brpaz/networth-tracker/actions/workflows/ci.yml)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-blue?style=for-the-badge&logo=docker)](https://github.com/brpaz/networth-tracker/pkgs/container/networth-tracker)
 [![Node.js](https://img.shields.io/badge/Node.js-24-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vue.js)](https://vuejs.org/)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4-00DC82?style=for-the-badge&logo=nuxt.js)](https://nuxt.com/)
+[![License](https://img.shields.io/badge/LICENSE-MIT-informational?style=for-the-badge)](./LICENSE.md)
 
-> A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui), with SQLite for data storage. Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
-
-## Screenshots
-
-| Dashboard                                      | Accounts                                     | Growth Simulator                               |
-| ---------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
-| ![Dashboard](./docs/screenshots/dashboard.png) | ![Accounts](./docs/screenshots/accounts.png) | ![Simulator](./docs/screenshots/simulator.png) |
+</p>
 
 ## 🎯 Motivation
 
@@ -26,6 +23,12 @@ I tried a bunch of different personal finance apps, but all of them were overly 
 - **Dashboard Charts** - Net worth evolution line chart and account type breakdown donut chart using Chart.js library.
 - **Growth Simulator** - Compound interest calculator with configurable initial amount, yearly rate, and time horizon. Includes projected growth chart.
 - **Single-user** - No authentication required. Data stored locally in SQLite.
+
+## 🖼️ Screenshots
+
+| Dashboard                                      | Accounts                                     | Growth Simulator                               |
+| ---------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| ![Dashboard](./docs/screenshots/dashboard.png) | ![Accounts](./docs/screenshots/accounts.png) | ![Simulator](./docs/screenshots/simulator.png) |
 
 ## 🚀 Getting Started
 

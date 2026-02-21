@@ -60,17 +60,6 @@ jobs:
       - name: Run Unit tests
         run: pnpm run test
 
-      - name: Debug reports directory
-        if: always()
-        run: |
-          ls -la
-          echo "=== Listing reports directory ==="
-          ls -la reports/ 2>/dev/null || echo "reports/ does not exist"
-          echo "=== Listing reports/unit ==="
-          ls -la reports/unit/ 2>/dev/null || echo "reports/unit/ does not exist"
-          echo "=== Listing reports/coverage ==="
-          ls -la reports/coverage/ 2>/dev/null || echo "reports/coverage/ does not exist"
-
       - name: Upload Test reports
         uses: actions/upload-artifact@v4
         if: always()
