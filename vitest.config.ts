@@ -1,17 +1,19 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config';
+import { defineConfig } from 'vitest/config';
 
-export default defineVitestConfig({
+export default defineConfig({
   test: {
     include: ['app/**/*.test.ts', 'server/**/*.test.ts'],
-    reporters: ['default', 'html', 'junit'],
-    outputFile: {
-      html: 'reports/unit/index.html',
-      junit: 'reports/unit/junit.xml',
-    },
+    environment: 'happy-dom',
+    reporters: [
+      'default',
+      ['html', { outputFile: 'reports/unit/index.html' }],
+      ['junit', { outputFile: 'reports/unit/junit.xml' }],
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: 'reports/coverage',
+      reportOnFailure: true,
       include: [
         'app/components/**/*',
         'app/composables/**/*',

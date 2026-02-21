@@ -18,7 +18,7 @@ env:
 
 jobs:
   lint:
-    name: Linting
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -27,9 +27,20 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint
-      - run: pnpm run format:check
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint Code
+        run: pnpm run lint
+
+      - name: Check Formatting
+        run: pnpm run format:check
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
 
   test-unit:
     name: Unit Tests
@@ -49,14 +60,26 @@ jobs:
       - name: Run Unit tests
         run: pnpm run test
 
-      - name: Upload Vitest reports
+      - name: Debug reports directory
+        if: always()
+        run: |
+          ls -la
+          echo "=== Listing reports directory ==="
+          ls -la reports/ 2>/dev/null || echo "reports/ does not exist"
+          echo "=== Listing reports/unit ==="
+          ls -la reports/unit/ 2>/dev/null || echo "reports/unit/ does not exist"
+          echo "=== Listing reports/coverage ==="
+          ls -la reports/coverage/ 2>/dev/null || echo "reports/coverage/ does not exist"
+
+      - name: Upload Test reports
         uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: always()
         with:
           name: unit-test-report
           path: |
             reports/unit
             reports/coverage
+          if-no-files-found: warn
           retention-days: 7
 
   test-e2e:
@@ -90,12 +113,13 @@ jobs:
 
       - name: Upload End-to-End test reports
         uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: always()
         with:
           name: e2e-test-report
           path: |
             reports/e2e
             reports/e2e-report
+          if-no-files-found: warn
           retention-days: 7
 
   build:

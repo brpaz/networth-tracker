@@ -21,6 +21,7 @@ in
     pkgs.nodejs_24
     pkgs.lefthook
     pkgs.sqlite
+    pkgs.hadolint
   ];
 
   languages.javascript = {

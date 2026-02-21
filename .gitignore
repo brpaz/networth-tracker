@@ -39,6 +39,7 @@ Thumbs.db
 
 # Test reports
 reports/
+coverage/
 
 # Devenv
 .devenv*

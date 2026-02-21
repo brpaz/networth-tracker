@@ -63,6 +63,16 @@ tasks:
     cmds:
       - pnpm lint:fix
 
+  lint:docker:
+    desc: Run Dockerfile linting
+    cmds:
+      - hadolint Dockerfile
+
+  lint:docker:fix:
+    desc: Run Dockerfile linting with auto-fix
+    cmds:
+      - hadolint --fix Dockerfile
+
   format:
     desc: Format code with Prettier
     cmds:

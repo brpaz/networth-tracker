@@ -1,5 +1,12 @@
 # Net Worth Tracker
 
+[![License](https://img.shields.io/badge/LICENSE-MIT-informational?style=for-the-badge)](./LICENSE.md)
+[![CI](https://img.shields.io/github/actions/workflow/status/brpaz/networth-tracker/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/brpaz/networth-tracker/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/badge/Docker-ghcr.io-blue?style=for-the-badge&logo=docker)](https://github.com/brpaz/networth-tracker/pkgs/container/networth-tracker)
+[![Node.js](https://img.shields.io/badge/Node.js-24-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vue.js)](https://vuejs.org/)
+[![Nuxt](https://img.shields.io/badge/Nuxt-4-00DC82?style=for-the-badge&logo=nuxt.js)](https://nuxt.com/)
+
 > A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui), with SQLite for data storage. Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
 
 ## Screenshots
