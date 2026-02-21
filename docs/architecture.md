@@ -341,12 +341,12 @@ export const accounts = sqliteTable('accounts', {
 
 ### Environment Variables
 
-| Variable       | Default                   | Description          |
-| -------------- | ------------------------- | -------------------- |
-| `DATABASE_URL` | `file:./data/networth.db` | SQLite database path |
-| `NODE_ENV`     | `development`             | Environment mode     |
-| `PORT`         | `3000`                    | Server port          |
-| `LOG_LEVEL`    | `info`                    | Logging verbosity    |
+| Variable            | Default                   | Description          |
+| ------------------- | ------------------------- | -------------------- |
+| `NUXT_DATABASE_URL` | `file:./data/networth.db` | SQLite database path |
+| `NODE_ENV`          | `development`             | Environment mode     |
+| `PORT`              | `3000`                    | Server port          |
+| `LOG_LEVEL`         | `info`                    | Logging verbosity    |
 
 ### Runtime Config
 

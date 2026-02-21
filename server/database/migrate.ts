@@ -8,7 +8,10 @@ import { existsSync } from 'node:fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const databaseUrl = (process.env.DATABASE_URL || 'file:./data/networth.db').replace('file:', '');
+const databaseUrl = (process.env.NUXT_DATABASE_URL || 'file:./data/networth.db').replace(
+  'file:',
+  '',
+);
 const sqlite = new Database(databaseUrl);
 sqlite.pragma('journal_mode = WAL');
 sqlite.pragma('foreign_keys = ON');

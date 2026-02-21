@@ -208,7 +208,7 @@ export function useAccountRepository() {
 
 ### Environment Variables
 
-- `DATABASE_URL` - SQLite file path (default: `file:./data/networth.db`)
+- `NUXT_DATABASE_URL` - SQLite file path (default: `file:./data/networth.db`)
 - `NODE_ENV` - environment (development/production)
 - `PORT` - server port (default: 3000)
 - `LOG_LEVEL` - logging verbosity (default: info)

@@ -4,5 +4,5 @@ metadata:
   name: networth-tracker-config
 data:
   NODE_ENV: 'production'
-  DATABASE_URL: 'file:/app/data/networth.db'
+  NUXT_DATABASE_URL: 'file:/app/data/networth.db'
   LOG_LEVEL: 'info'

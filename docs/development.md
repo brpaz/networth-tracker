@@ -283,7 +283,7 @@ Create a `.env` file in the project root (or copy from `.env.example`):
 
 ```bash
 # Database
-DATABASE_URL=file:./data/networth.db
+NUXT_DATABASE_URL=file:./data/networth.db
 
 # Server
 NODE_ENV=development
