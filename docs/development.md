@@ -65,9 +65,6 @@ pnpm install
 # Install Playwright browsers
 pnpm exec playwright install --with-deps chromium
 
-# Set up git hooks
-pnpm exec lefthook install
-
 # Create environment file
 cp .env.example .env
 ```
@@ -149,11 +146,12 @@ pnpm format:check
 
 Git hooks are managed by [Lefthook](https://github.com/evilmartians/lefthook) and run automatically:
 
-| Hook         | Commands                                  |
-| ------------ | ----------------------------------------- |
-| `pre-commit` | ESLint (auto-fix), Prettier (auto-format) |
+| Hook         | Commands                                         |
+| ------------ | ------------------------------------------------ |
+| `pre-commit` | ESLint (auto-fix), Prettier (auto-format)        |
+| `commit-msg` | Runs commitlint and checks commit message format |
 
-Configuration: `lefthook.yml`
+Configuration file: [lefthook.yml](../lefthook.yml)
 
 ## Testing
 
@@ -240,6 +238,27 @@ docker buildx build \
   .
 ```
 
+## Available Tasks
+
+This project uses [Task](https://taskfile.dev/) as a task runner for common development operations. Tasks are defined in `Taskfile.yml`.
+
+## Quick Reference
+
+| Task            | Description                  |
+| --------------- | ---------------------------- |
+| `task`          | List all available tasks     |
+| `task deps`     | Install project dependencies |
+| `task dev`      | Start development server     |
+| `task build`    | Build for production         |
+| `task lint`     | Run ESLint                   |
+| `task format`   | Format with Prettier         |
+| `task test`     | Run unit tests               |
+| `task test:e2e` | Run E2E tests                |
+| `task up`       | Start Docker Compose         |
+| `task ci`       | Run full CI pipeline         |
+
+To see a complete list available tasks run `task` from your terminal.
+
 ## IDE Setup
 
 ### VS Code
@@ -317,15 +336,4 @@ nix-collect-garbage -d
 
 # Rebuild devenv
 devenv gc
-```
-
-## Useful Aliases
-
-Add to your shell configuration:
-
-```bash
-alias nwt-dev='pnpm dev'
-alias nwt-test='pnpm test'
-alias nwt-lint='pnpm lint:fix'
-alias nwt-db='pnpm db:studio'
 ```
