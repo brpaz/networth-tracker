@@ -1,6 +1,6 @@
 # Net Worth Tracker
 
-> A Vibe Coded personal net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui). Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
+> A simple net worth tracking application built with [Nuxt](https://nuxt.com/) and [Nuxt UI](https://nuxt.com/ui). Track accounts, record value snapshots over time, visualise growth, and simulate compound interest projections.
 
 ## 🎯 Motivation
 
