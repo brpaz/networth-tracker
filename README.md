@@ -86,13 +86,17 @@ See [docs/development.md](./docs/development.md) for full setup instructions, in
 | Package Manager | pnpm 10                              |
 | Runtime         | Node.js 24                           |
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
+This project was developed to scratch a personal itch. It's a personal project, and thus I plan to keep it limited in terms of features.
+
+Still, I'm open to contributions that align with my vision and goals for the project. If you have an idea or feature request, please open an issue or submit a pull request.
+
+Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
 
 ## 🙋 Contributors
 
-- Bruno Paz <oss@brunodev.dev>
+- Bruno Paz <oss@brunopaz.dev>
 
 ## 📝 License
 
