@@ -6,7 +6,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   outputDir: './reports/e2e',
   webServer: {
-    command: 'pnpm dev',
+    command: process.env.CI ? 'pnpm preview' : 'pnpm dev',
     port,
     reuseExistingServer: !process.env.CI,
   },
