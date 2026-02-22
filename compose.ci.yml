@@ -2,7 +2,7 @@ services:
   app:
     image: ${IMAGE_REF}
     ports:
-      - '${CI_PORT:-3000}:3000'
+      - "${CI_PORT:-3000}:3000"
     environment:
       NUXT_DATABASE_URL: file:/app/data/networth.db
       NODE_ENV: production
@@ -11,7 +11,7 @@ services:
     networks:
       - networth-tracker-ci
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 5s
       timeout: 3s
       retries: 10

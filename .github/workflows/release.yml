@@ -22,5 +22,5 @@ jobs:
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: 'chore(release): release ${{ github.event.release.tag_name }} [skip ci]'
+          commit_message: "chore(release): release ${{ github.event.release.tag_name }} [skip ci]"
           file_pattern: CHANGELOG.md

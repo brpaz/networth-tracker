@@ -1,7 +1,7 @@
-name-template: '$RESOLVED_VERSION'
-tag-template: 'v$RESOLVED_VERSION'
+name-template: "$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
 categories:
-  - title: 'Breaking Changes'
+  - title: "Breaking Changes"
     labels:
       - breaking
   - title: 🚀 Features
@@ -24,74 +24,74 @@ categories:
       - deps
       - dependencies
     collapse-after: 5
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 exclude-labels:
-  - 'skip-changelog'
+  - "skip-changelog"
 version-resolver:
   major:
     labels:
-      - 'breaking'
+      - "breaking"
   minor:
     labels:
       - feature
       - performance
   patch:
     labels:
-      - 'bug'
-      - 'maintenance'
-      - 'dependencies'
-      - 'security'
-      - 'docs'
+      - "bug"
+      - "maintenance"
+      - "dependencies"
+      - "security"
+      - "docs"
 autolabeler:
   - label: breaking
     title:
-      - '/^break!:/i'
-      - '/^BREAKING CHANGE:/i'
+      - "/^break!:/i"
+      - "/^BREAKING CHANGE:/i"
     branch:
       - '/^breaking\//'
   - label: feature
     title:
-      - '/^feat:/i'
+      - "/^feat:/i"
     branch:
       - '/^feature\//'
       - '/^feat\//'
   - label: bug
     title:
-      - '/^fix:/i'
+      - "/^fix:/i"
     branch:
       - '/^fix\//'
       - '/^bugfix\//'
       - '/^hotfix\//'
   - label: security
     title:
-      - '/^security:/i'
+      - "/^security:/i"
     branch:
       - '/^security\//'
   - label: performance
     title:
-      - '/^perf:/i'
+      - "/^perf:/i"
     branch:
       - '/^perf\//'
   - label: maintenance
     title:
-      - '/^chore:/i'
-      - '/^refactor:/i'
-      - '/^style:/i'
+      - "/^chore:/i"
+      - "/^refactor:/i"
+      - "/^style:/i"
     branch:
       - '/^chore\//'
       - '/^refactor\//'
       - '/^maintenance\//'
   - label: docs
     title:
-      - '/^docs:/i'
+      - "/^docs:/i"
     branch:
       - '/^docs\//'
       - '/^documentation\//'
   - label: dependencies
     title:
-      - '/^deps:/i'
-      - '/^build:/i'
+      - "/^deps:/i"
+      - "/^build:/i"
     branch:
       - '/^renovate\//'
       - '/^dependabot\//'

@@ -2,6 +2,14 @@ export default {
   semi: true,
   singleQuote: true,
   trailingComma: 'all',
-  printWidth: 100,
+  printWidth: 120,
   tabWidth: 2,
+  overrides: [
+    {
+      files: ['*.yml', '*.yaml'],
+      options: {
+        singleQuote: false,
+      },
+    },
+  ],
 };
