@@ -1,12 +1,13 @@
 import { desc, eq, sql } from 'drizzle-orm';
 import { useDatabase } from '../database';
 import { accounts } from '../database/schema';
+import type { AccountWithValue, CreateAccountInput, UpdateAccountInput } from '../types/account';
 
 export function useAccountRepository() {
   const db = useDatabase();
 
   return {
-    async findAll() {
+    async findAll(): Promise<AccountWithValue[]> {
       return db
         .select({
           id: accounts.id,
@@ -31,12 +32,12 @@ export function useAccountRepository() {
       return db.select().from(accounts).where(eq(accounts.id, id)).get();
     },
 
-    async create(data: { name: string; type: string; currency: string }) {
+    async create(data: CreateAccountInput) {
       const [account] = await db.insert(accounts).values(data).returning();
       return account;
     },
 
-    async update(id: number, data: Partial<{ name: string; type: string; currency: string }>) {
+    async update(id: number, data: UpdateAccountInput) {
       const [account] = await db
         .update(accounts)
         .set({ ...data, updatedAt: sql`(unixepoch())` })

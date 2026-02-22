@@ -1,12 +1,13 @@
 import { sql } from 'drizzle-orm';
 import { useDatabase } from '../database';
 import { accounts, accountSnapshots } from '../database/schema';
+import type { NetWorthDataPoint, AccountTypeBreakdown } from '../types/stats';
 
 export function useStatsRepository() {
   const db = useDatabase();
 
   return {
-    async getNetWorthHistory(days = 365) {
+    async getNetWorthHistory(days = 365): Promise<NetWorthDataPoint[]> {
       return db.all(sql`
         WITH daily_values AS (
           SELECT
@@ -25,10 +26,10 @@ export function useStatsRepository() {
         WHERE rn = 1
         GROUP BY date
         ORDER BY date ASC
-      `);
+      `) as NetWorthDataPoint[];
     },
 
-    async getByType() {
+    async getByType(): Promise<AccountTypeBreakdown[]> {
       return db.all(sql`
         SELECT
           ${accounts.type} as type,
@@ -45,7 +46,7 @@ export function useStatsRepository() {
           FROM ${accountSnapshots}
         ) latest ON latest.account_id = ${accounts.id} AND latest.rn = 1
         GROUP BY ${accounts.type}
-      `);
+      `) as AccountTypeBreakdown[];
     },
   };
 }

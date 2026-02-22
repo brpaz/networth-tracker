@@ -1,5 +1,6 @@
 import { useAccountRepository } from '../repositories/account.repository';
 import { NotFoundError } from '../errors';
+import type { CreateAccountInput, UpdateAccountInput } from '../types/account';
 
 export function useAccountService() {
   const repo = useAccountRepository();
@@ -17,14 +18,11 @@ export function useAccountService() {
       return account;
     },
 
-    async createAccount(data: { name: string; type: string; currency: string }) {
+    async createAccount(data: CreateAccountInput) {
       return repo.create(data);
     },
 
-    async updateAccount(
-      id: number,
-      data: Partial<{ name: string; type: string; currency: string }>,
-    ) {
+    async updateAccount(id: number, data: UpdateAccountInput) {
       await this.getAccount(id);
       return repo.update(id, data);
     },

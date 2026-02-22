@@ -1,13 +1,14 @@
 import { useSnapshotRepository } from '../repositories/snapshot.repository';
 import { useAccountRepository } from '../repositories/account.repository';
 import { NotFoundError } from '../errors';
+import type { CreateSnapshotInput } from '../types/snapshot';
 
 export function useSnapshotService() {
   const snapshotRepo = useSnapshotRepository();
   const accountRepo = useAccountRepository();
 
   return {
-    async recordSnapshot(data: { accountId: number; value: number }) {
+    async recordSnapshot(data: CreateSnapshotInput) {
       const account = await accountRepo.findById(data.accountId);
       if (!account) {
         throw new NotFoundError('Account not found');

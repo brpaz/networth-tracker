@@ -14,10 +14,10 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: 'file:./data/networth.db',
+    version: process.env.VERSION || '',
+    gitRef: process.env.GIT_REF || '',
     public: {
-      version: process.env.VERSION || 'dev',
-      gitRef: process.env.GIT_REF || '',
-      baseCurrency: process.env.NUXT_PUBLIC_BASE_CURRENCY || 'EUR',
+      baseCurrency: 'EUR',
     },
   },
 

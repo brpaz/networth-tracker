@@ -1,22 +1,19 @@
 import { desc, eq } from 'drizzle-orm';
 import { useDatabase } from '../database';
 import { accountSnapshots } from '../database/schema';
+import type { CreateSnapshotInput } from '../types/snapshot';
 
 export function useSnapshotRepository() {
   const db = useDatabase();
 
   return {
-    async create(data: { accountId: number; value: number }) {
+    async create(data: CreateSnapshotInput) {
       const [snapshot] = await db.insert(accountSnapshots).values(data).returning();
       return snapshot;
     },
 
     async findById(id: number) {
-      const [snapshot] = await db
-        .select()
-        .from(accountSnapshots)
-        .where(eq(accountSnapshots.id, id))
-        .limit(1);
+      const [snapshot] = await db.select().from(accountSnapshots).where(eq(accountSnapshots.id, id)).limit(1);
       return snapshot;
     },
 
@@ -30,10 +27,7 @@ export function useSnapshotRepository() {
     },
 
     async deleteById(id: number) {
-      const [deleted] = await db
-        .delete(accountSnapshots)
-        .where(eq(accountSnapshots.id, id))
-        .returning();
+      const [deleted] = await db.delete(accountSnapshots).where(eq(accountSnapshots.id, id)).returning();
       return deleted;
     },
   };
