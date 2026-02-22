@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Generate Updated Changelog
         uses: stefanzweifel/changelog-updater-action@v1
