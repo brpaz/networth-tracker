@@ -5,10 +5,8 @@ export default defineConfig({
   title: 'Net Worth Tracker',
   description:
     'A simple net worth tracking application built with Nuxt, Nuxt UI and SQLite for data storage.',
-
+  base: process.env.BASE_PATH || '/',
   srcExclude: ['**/README.md'],
-
-  ignoreDeadLinks: [/^https?:\/\/localhost/],
 
   themeConfig: {
     nav: [
