@@ -1,11 +1,6 @@
 import { defineConfig } from 'vitest/config';
-import path from 'path';
+
 export default defineConfig({
-  resolve: {
-    alias: {
-      h3: path.resolve('./node_modules/.pnpm/h3@1.15.5/node_modules/h3'),
-    },
-  },
   test: {
     include: ['app/**/*.test.ts', 'server/**/*.test.ts'],
     environment: 'happy-dom',
