@@ -1,12 +1,4 @@
-export const accountTypes = [
-  'stocks',
-  'cash',
-  'crypto',
-  'real_estate',
-  'bonds',
-  'retirement',
-  'other',
-] as const;
+export const accountTypes = ['stocks', 'cash', 'crypto', 'real_estate', 'bonds', 'retirement', 'other'] as const;
 
 export type AccountType = (typeof accountTypes)[number];
 

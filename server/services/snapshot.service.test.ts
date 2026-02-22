@@ -57,9 +57,7 @@ describe('useSnapshotService', () => {
     });
 
     it('throws NotFoundError when account does not exist', async () => {
-      await expect(service.recordSnapshot({ accountId: 999, value: 100 })).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(service.recordSnapshot({ accountId: 999, value: 100 })).rejects.toThrow(NotFoundError);
 
       const db = getTestDatabase();
       const snapshots = db.select().from(accountSnapshots).all();
@@ -100,11 +98,7 @@ describe('useSnapshotService', () => {
     it('deletes snapshot and returns it', async () => {
       const account = insertAccount();
       const db = getTestDatabase();
-      const [snapshot] = db
-        .insert(accountSnapshots)
-        .values({ accountId: account.id, value: 5000 })
-        .returning()
-        .all();
+      const [snapshot] = db.insert(accountSnapshots).values({ accountId: account.id, value: 5000 }).returning().all();
 
       const result = await service.deleteSnapshot(snapshot.id);
 
@@ -115,11 +109,7 @@ describe('useSnapshotService', () => {
     it('actually removes snapshot from database', async () => {
       const account = insertAccount();
       const db = getTestDatabase();
-      const [snapshot] = db
-        .insert(accountSnapshots)
-        .values({ accountId: account.id, value: 5000 })
-        .returning()
-        .all();
+      const [snapshot] = db.insert(accountSnapshots).values({ accountId: account.id, value: 5000 }).returning().all();
 
       await service.deleteSnapshot(snapshot.id);
 

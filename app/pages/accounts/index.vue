@@ -5,22 +5,12 @@ definePageMeta({ layout: 'default' });
 
 const baseCurrency = useBaseCurrency();
 
-const {
-  accounts,
-  loading,
-  fetchAccounts,
-  createAccount,
-  updateAccount,
-  deleteAccount,
-  recordSnapshot,
-} = useAccounts();
+const { accounts, loading, fetchAccounts, createAccount, updateAccount, deleteAccount, recordSnapshot } = useAccounts();
 const toast = useToast();
 
 await fetchAccounts();
 
-const totalValue = computed(() =>
-  accounts.value.reduce((sum, a) => sum + (a.currentValue || 0), 0),
-);
+const totalValue = computed(() => accounts.value.reduce((sum, a) => sum + (a.currentValue || 0), 0));
 
 function pct(value: number | null) {
   if (!totalValue.value || !value) return '0.0%';

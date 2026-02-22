@@ -1,15 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const accountTypes = [
-  'stocks',
-  'cash',
-  'crypto',
-  'real_estate',
-  'bonds',
-  'retirement',
-  'other',
-] as const;
+export const accountTypes = ['stocks', 'cash', 'crypto', 'real_estate', 'bonds', 'retirement', 'other'] as const;
 
 export type AccountType = (typeof accountTypes)[number];
 

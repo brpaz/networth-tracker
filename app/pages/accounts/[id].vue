@@ -8,9 +8,7 @@ const route = useRoute();
 const toast = useToast();
 const accountId = Number(route.params.id);
 
-const { data: account, error: accountError } = await useFetch<Account>(
-  `/api/accounts/${accountId}`,
-);
+const { data: account, error: accountError } = await useFetch<Account>(`/api/accounts/${accountId}`);
 
 if (accountError.value) {
   throw createError({ statusCode: 404, statusMessage: 'Account not found' });

@@ -1,4 +1,4 @@
-import type { accounts, AccountType  } from '../database/schema';
+import type { accounts, AccountType } from '../database/schema';
 
 export type Account = typeof accounts.$inferSelect;
 

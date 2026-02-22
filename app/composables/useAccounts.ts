@@ -23,10 +23,7 @@ export function useAccounts() {
     return account;
   };
 
-  const updateAccount = async (
-    id: number,
-    data: Partial<{ name: string; type: string; currency: string }>,
-  ) => {
+  const updateAccount = async (id: number, data: Partial<{ name: string; type: string; currency: string }>) => {
     const account = await $fetch<Account>(`/api/accounts/${id}`, {
       method: 'PUT',
       body: data,

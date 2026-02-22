@@ -9,9 +9,7 @@ const { data: accounts } = await useFetch<Account[]>('/api/accounts');
 const { data: networth } = await useFetch('/api/stats/networth');
 const { data: byType } = await useFetch<{ type: string; total: number }[]>('/api/stats/by-type');
 
-const totalNetWorth = computed(() =>
-  (accounts.value || []).reduce((sum, a) => sum + (a.currentValue || 0), 0),
-);
+const totalNetWorth = computed(() => (accounts.value || []).reduce((sum, a) => sum + (a.currentValue || 0), 0));
 
 function pct(value: number | null) {
   if (!totalNetWorth.value || !value) return '0.0%';
@@ -63,11 +61,7 @@ const tableColumns = [
         </template>
         <AccountTypeChart :data="byType" />
         <ul class="mt-4 space-y-2">
-          <li
-            v-for="t in typeBreakdown"
-            :key="t.type"
-            class="flex items-center justify-between text-sm"
-          >
+          <li v-for="t in typeBreakdown" :key="t.type" class="flex items-center justify-between text-sm">
             <span class="capitalize text-muted">{{ t.type.replace('_', ' ') }}</span>
             <div class="flex items-center gap-3">
               <span>{{ formatCurrency(t.total, baseCurrency) }}</span>

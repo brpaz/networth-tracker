@@ -22,9 +22,7 @@ if (accounts.value) {
 const simulationData = computed(() => {
   const data = [];
   let current = initialAmount.value;
-  const effectiveRate = adjustForInflation.value
-    ? yearlyRate.value - inflationRate.value
-    : yearlyRate.value;
+  const effectiveRate = adjustForInflation.value ? yearlyRate.value - inflationRate.value : yearlyRate.value;
   const cgtMultiplier = adjustForCapitalGainsTax.value ? 1 - capitalGainsTaxRate.value / 100 : 1;
 
   for (let i = 0; i <= years.value; i++) {
@@ -38,9 +36,7 @@ const simulationData = computed(() => {
   return data;
 });
 
-const finalValue = computed(
-  () => simulationData.value[simulationData.value.length - 1]?.value || 0,
-);
+const finalValue = computed(() => simulationData.value[simulationData.value.length - 1]?.value || 0);
 const totalGrowth = computed(() => finalValue.value - initialAmount.value);
 </script>
 

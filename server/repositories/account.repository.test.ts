@@ -33,12 +33,8 @@ describe('useAccountRepository', () => {
       const db = getTestDatabase();
       const past = new Date(Date.now() - 60000);
       const now = new Date();
-      db.insert(accounts)
-        .values({ name: 'Older', type: 'cash', currency: 'EUR', updatedAt: past })
-        .run();
-      db.insert(accounts)
-        .values({ name: 'Newer', type: 'stocks', currency: 'USD', updatedAt: now })
-        .run();
+      db.insert(accounts).values({ name: 'Older', type: 'cash', currency: 'EUR', updatedAt: past }).run();
+      db.insert(accounts).values({ name: 'Newer', type: 'stocks', currency: 'USD', updatedAt: now }).run();
 
       const result = await repo.findAll();
 
@@ -56,12 +52,8 @@ describe('useAccountRepository', () => {
         .all();
       const earlier = new Date(Date.now() - 60000);
       const later = new Date();
-      db.insert(accountSnapshots)
-        .values({ accountId: account.id, value: 1000, recordedAt: earlier })
-        .run();
-      db.insert(accountSnapshots)
-        .values({ accountId: account.id, value: 2000, recordedAt: later })
-        .run();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 1000, recordedAt: earlier }).run();
+      db.insert(accountSnapshots).values({ accountId: account.id, value: 2000, recordedAt: later }).run();
 
       const result = await repo.findAll();
 

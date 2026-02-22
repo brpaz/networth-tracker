@@ -25,9 +25,7 @@ function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
 }
 
-const colorModeIcon = computed(() =>
-  colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-);
+const colorModeIcon = computed(() => (colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'));
 </script>
 
 <template>
@@ -55,9 +53,7 @@ const colorModeIcon = computed(() =>
     </aside>
 
     <div class="flex flex-1 flex-col min-w-0">
-      <header
-        class="flex md:hidden items-center justify-between border-b border-(--ui-border) px-4 py-3"
-      >
+      <header class="flex md:hidden items-center justify-between border-b border-(--ui-border) px-4 py-3">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-landmark" class="size-5 text-primary" />
           <span class="font-bold text-sm">Net Worth Tracker</span>

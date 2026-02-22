@@ -2,9 +2,23 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['app/**/*.test.ts', 'server/**/*.test.ts'],
-    environment: 'happy-dom',
-    setupFiles: ['server/test/setup-globals.ts'],
+    projects: [
+      {
+        test: {
+          name: 'server',
+          include: ['server/**/*.test.ts'],
+          environment: 'node',
+          setupFiles: ['server/test/setup-globals.ts'],
+        },
+      },
+      {
+        test: {
+          name: 'app',
+          include: ['app/**/*.test.ts'],
+          environment: 'happy-dom',
+        },
+      },
+    ],
     reporters: [
       'default',
       ['html', { outputFile: 'reports/unit/index.html' }],

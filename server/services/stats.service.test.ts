@@ -89,9 +89,7 @@ describe('useStatsService', () => {
 
       expect(result.length).toBeGreaterThanOrEqual(2);
       for (let i = 1; i < result.length; i++) {
-        expect(
-          (result[i] as { date: string }).date >= (result[i - 1] as { date: string }).date,
-        ).toBe(true);
+        expect((result[i] as { date: string }).date >= (result[i - 1] as { date: string }).date).toBe(true);
       }
     });
   });
@@ -113,12 +111,8 @@ describe('useStatsService', () => {
 
       const result = await service.getByType();
 
-      const cashResult = (result as { type: string; total: number }[]).find(
-        (r) => r.type === 'cash',
-      );
-      const stocksResult = (result as { type: string; total: number }[]).find(
-        (r) => r.type === 'stocks',
-      );
+      const cashResult = (result as { type: string; total: number }[]).find((r) => r.type === 'cash');
+      const stocksResult = (result as { type: string; total: number }[]).find((r) => r.type === 'stocks');
 
       expect(cashResult).toBeDefined();
       expect(cashResult!.total).toBe(3000);
@@ -135,9 +129,7 @@ describe('useStatsService', () => {
 
       const result = await service.getByType();
 
-      const cashResult = (result as { type: string; total: number }[]).find(
-        (r) => r.type === 'cash',
-      );
+      const cashResult = (result as { type: string; total: number }[]).find((r) => r.type === 'cash');
       expect(cashResult).toBeDefined();
       expect(cashResult!.total).toBe(3000);
     });
@@ -147,9 +139,7 @@ describe('useStatsService', () => {
 
       const result = await service.getByType();
 
-      const bondsResult = (result as { type: string; total: number | null }[]).find(
-        (r) => r.type === 'bonds',
-      );
+      const bondsResult = (result as { type: string; total: number | null }[]).find((r) => r.type === 'bonds');
       expect(bondsResult).toBeDefined();
       expect(bondsResult!.total).toBeNull();
     });
