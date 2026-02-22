@@ -1,6 +1,6 @@
 # Tech Stack
 
-This document provides an overview of the technologies, frameworks, and libraries used in the Net Worth Tracker project.
+This page provides an overview of the technologies, frameworks, and libraries used in the Net Worth Tracker project.
 
 ## Runtime & Package Management
 
@@ -79,30 +79,3 @@ This document provides an overview of the technologies, frameworks, and librarie
 - **Docker Compose** — Multi-container orchestration
 - **Kustomize** — Kubernetes native configuration management
 - **Renovate** — Automated dependency updates
-
-## Technology Decisions
-
-### Why Nuxt?
-
-- Full-stack framework with SSR/SSG capabilities
-- Built-in file-based routing
-- Auto-imports for composables and components
-- Nitro server engine with multiple deployment presets
-
-### Why SQLite with Drizzle?
-
-- Zero-configuration database perfect for single-user deployment
-- Drizzle ORM provides type-safe queries with minimal overhead
-- Portable database file for easy backup and migration
-
-### Why Vitest over Jest?
-
-- Native ESM support without configuration
-- Faster test execution with Vite's transformation pipeline
-- Drop-in compatible API with Jest
-
-### Why Playwright?
-
-- Cross-browser testing (Chromium, Firefox, WebKit)
-- Auto-wait capabilities for reliable tests
-- Built-in tracing and debugging tools

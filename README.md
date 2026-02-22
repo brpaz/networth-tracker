@@ -9,6 +9,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4-00DC82?style=for-the-badge&logo=nuxt.js)](https://nuxt.com/)
 [![License](https://img.shields.io/badge/LICENSE-MIT-informational?style=for-the-badge)](./LICENSE.md)
+[![Docs](https://img.shields.io/badge/docs-online-blue?style=for-the-badge&logo=readthedocs)](https://brpaz.github.io/networth-tracker/)
 
 </div>
 
@@ -44,7 +45,7 @@ docker run -d \
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
 
-For Docker Compose setup, configuration options, upgrade and backup instructions, see the **[Getting Started guide](./docs/getting-started.md)**.
+For Docker Compose setup, configuration options, upgrade and backup instructions, see the **[Getting Started guide](./docs/getting-started.md)** or the published [documentation site](https://brpaz.github.io/networth-tracker/).
 
 ## 🏗️ Development
 

@@ -1,6 +1,6 @@
 # Documentation
 
-Technical documentation for the Net Worth Tracker project.
+Technical documentation for the Net Worth Tracker project. Also available at [brpaz.github.io/networth-tracker](https://brpaz.github.io/networth-tracker/).
 
 | Document                                    | Description                                           |
 | ------------------------------------------- | ----------------------------------------------------- |
