@@ -13,6 +13,7 @@ export interface HealthCheckResponse {
   releaseId?: string;
   serviceId: string;
   description: string;
+
   checks?: {
     [key: string]: HealthCheckComponent[];
   };

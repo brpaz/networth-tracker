@@ -42,9 +42,13 @@ CMD ["sh", "-c", "pnpm install && pnpm db:migrate && pnpm dev"]
 # Build Stage
 # =================================================
 FROM deps AS build
-
 COPY . .
-
+ARG GIT_REF
+ARG BUILD_DATE
+ARG VERSION
+ENV GIT_REF=${GIT_REF}
+ENV BUILD_DATE=${BUILD_DATE}
+ENV VERSION=${VERSION}
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     --mount=type=cache,id=nuxt,target=/app/node_modules/.cache \
     pnpm build

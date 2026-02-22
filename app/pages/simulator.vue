@@ -6,6 +6,7 @@ definePageMeta({ layout: 'default' });
 const initialAmount = ref(10000);
 const yearlyRate = ref(7);
 const years = ref(20);
+const monthlyContribution = ref(0);
 const inflationRate = ref(2);
 const adjustForInflation = ref(false);
 const capitalGainsTaxRate = ref(14);
@@ -24,20 +25,22 @@ const simulationData = computed(() => {
   let current = initialAmount.value;
   const effectiveRate = adjustForInflation.value ? yearlyRate.value - inflationRate.value : yearlyRate.value;
   const cgtMultiplier = adjustForCapitalGainsTax.value ? 1 - capitalGainsTaxRate.value / 100 : 1;
-
+  const yearlyContribution = monthlyContribution.value * 12;
   for (let i = 0; i <= years.value; i++) {
     data.push({
       year: i,
       value: Math.round(current * 100) / 100,
     });
     const yearlyGains = current * (effectiveRate / 100);
-    current += yearlyGains * cgtMultiplier;
+    current += yearlyGains * cgtMultiplier + yearlyContribution;
   }
   return data;
 });
 
 const finalValue = computed(() => simulationData.value[simulationData.value.length - 1]?.value || 0);
-const totalGrowth = computed(() => finalValue.value - initialAmount.value);
+const totalGrowth = computed(
+  () => finalValue.value - initialAmount.value - monthlyContribution.value * 12 * years.value,
+);
 </script>
 
 <template>
@@ -47,9 +50,12 @@ const totalGrowth = computed(() => finalValue.value - initialAmount.value);
         <h3 class="font-semibold">Growth Simulator</h3>
       </template>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <UFormField label="Initial Amount">
           <UInputNumber v-model="initialAmount" :min="0" :step="1000" />
+        </UFormField>
+        <UFormField label="Monthly Contribution">
+          <UInputNumber v-model="monthlyContribution" :min="0" :step="100" />
         </UFormField>
         <UFormField label="Yearly Rate (%)">
           <UInputNumber v-model="yearlyRate" :min="0" :max="100" :step="0.5" />

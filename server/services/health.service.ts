@@ -27,6 +27,7 @@ export function useHealthService() {
         releaseId: useRuntimeConfig().gitRef || undefined,
         serviceId: 'networth-tracker',
         description: 'Net Worth Tracker API',
+
         checks: {
           'database:connectivity': [
             {
