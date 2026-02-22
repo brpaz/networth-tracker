@@ -30,17 +30,11 @@ I tried a bunch of different personal finance apps, but all of them were overly 
 | ---------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
 | ![Dashboard](./docs/screenshots/dashboard.png) | ![Accounts](./docs/screenshots/accounts.png) | ![Simulator](./docs/screenshots/simulator.png) |
 
-## 🚀 Getting Started
-
-### Run with Docker (recommended)
-
-The easiest way to run the app is with the pre-built image from the GitHub Container Registry:
+## 🚀 Quick Start
 
 ```bash
-# Volume to store SQLite data
 docker volume create networth-data
 
-# Run the app
 docker run -d \
   --name networth-tracker \
   -p 3000:3000 \
@@ -50,51 +44,11 @@ docker run -d \
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
 
+For Docker Compose setup, configuration options, upgrade and backup instructions, see the **[Getting Started guide](./docs/getting-started.md)**.
+
 ## 🏗️ Development
 
-### Quick start
-
-The recommended way to run this app is using [Devenv](https://devenv.sh/).
-
-```bash
-# Clone the repository
-git clone https://github.com/brpaz/networth-tracker.git
-cd networth-tracker
-```
-
-**With [direnv](https://direnv.net/) (recommended)** — the environment loads automatically on directory entry:
-
-```bash
-direnv allow
-pnpm dev
-```
-
-**Without direnv** — enter the dev shell manually:
-
-```bash
-devenv shell
-pnpm dev
-```
-
-The app will be available at [http://localhost:3000](http://localhost:3000).
-
-See [docs/development.md](./docs/development.md) for full setup instructions, including manual setup without Nix.
-
-### Tech Stack
-
-| Layer           | Technology                           |
-| --------------- | ------------------------------------ |
-| Framework       | Nuxt 4, Vue 3                        |
-| UI              | Nuxt UI, Tailwind CSS                |
-| Database        | SQLite (better-sqlite3), Drizzle ORM |
-| Charts          | Chart.js, vue-chartjs                |
-| Validation      | Zod                                  |
-| Logging         | Pino, pino-http                      |
-| Testing         | Vitest (unit), Playwright (e2e)      |
-| Linting         | ESLint, Prettier                     |
-| Git Hooks       | Lefthook                             |
-| Package Manager | pnpm 10                              |
-| Runtime         | Node.js 24                           |
+See the **[Development Environment guide](./docs/development.md)** for full setup instructions.
 
 ## 🤝 Contributing
 

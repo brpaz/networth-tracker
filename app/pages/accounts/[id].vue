@@ -3,9 +3,9 @@ import type { Account, Snapshot } from '~/types';
 
 definePageMeta({ layout: 'default' });
 
+const baseCurrency = useBaseCurrency();
 const route = useRoute();
 const toast = useToast();
-const { formatCurrency, formatDate } = useFormatters();
 const accountId = Number(route.params.id);
 
 const { data: account, error: accountError } = await useFetch<Account>(
@@ -39,7 +39,7 @@ async function deleteSnapshot(snapshotId: number) {
       <UButton icon="i-lucide-arrow-left" variant="ghost" color="neutral" to="/accounts" />
       <div>
         <h2 class="text-xl font-bold">{{ account?.name }}</h2>
-        <p class="text-sm text-muted">{{ account?.type }} &middot; {{ account?.currency }}</p>
+        <p class="text-sm text-muted">{{ account?.type }}</p>
       </div>
     </div>
 
@@ -73,7 +73,7 @@ async function deleteSnapshot(snapshotId: number) {
         </template>
         <template #value-cell="{ row }">
           <span class="font-medium">
-            {{ formatCurrency(row.original.value, account?.currency) }}
+            {{ formatCurrency(row.original.value, baseCurrency) }}
           </span>
         </template>
         <template #actions-cell="{ row }">

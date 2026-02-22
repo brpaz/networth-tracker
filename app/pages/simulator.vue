@@ -78,14 +78,12 @@ const totalGrowth = computed(() => finalValue.value - initialAmount.value);
         <UCard variant="subtle">
           <p class="text-xs text-muted">Final Value</p>
           <p class="text-xl font-bold text-primary">
-            {{ useFormatters().formatCurrency(finalValue) }}
+            {{ formatCurrency(finalValue) }}
           </p>
         </UCard>
         <UCard variant="subtle">
           <p class="text-xs text-muted">Total Growth</p>
-          <p class="text-xl font-bold text-green-600">
-            +{{ useFormatters().formatCurrency(totalGrowth) }}
-          </p>
+          <p class="text-xl font-bold text-green-600">+{{ formatCurrency(totalGrowth) }}</p>
         </UCard>
         <UCard variant="subtle">
           <p class="text-xs text-muted">Growth Multiplier</p>

@@ -3,11 +3,11 @@ import type { Account } from '~/types';
 
 definePageMeta({ layout: 'default' });
 
+const baseCurrency = useBaseCurrency();
+
 const { data: accounts } = await useFetch<Account[]>('/api/accounts');
 const { data: networth } = await useFetch('/api/stats/networth');
 const { data: byType } = await useFetch<{ type: string; total: number }[]>('/api/stats/by-type');
-
-const { formatCurrency } = useFormatters();
 
 const totalNetWorth = computed(() =>
   (accounts.value || []).reduce((sum, a) => sum + (a.currentValue || 0), 0),
@@ -44,7 +44,7 @@ const tableColumns = [
       <div class="text-center">
         <p class="text-sm text-muted">Total Net Worth</p>
         <p class="text-4xl font-bold text-primary">
-          {{ formatCurrency(totalNetWorth) }}
+          {{ formatCurrency(totalNetWorth, baseCurrency) }}
         </p>
       </div>
     </UCard>
@@ -70,7 +70,7 @@ const tableColumns = [
           >
             <span class="capitalize text-muted">{{ t.type.replace('_', ' ') }}</span>
             <div class="flex items-center gap-3">
-              <span>{{ formatCurrency(t.total) }}</span>
+              <span>{{ formatCurrency(t.total, baseCurrency) }}</span>
               <UBadge variant="subtle" color="primary" class="w-16 justify-center">
                 {{ t.pct }}
               </UBadge>

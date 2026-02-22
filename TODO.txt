@@ -2,3 +2,4 @@
 
 - Code Review and cleanup.
 - Renovate merge related packages into single PR
+- Observability (OTEL + Prometheus)

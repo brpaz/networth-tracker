@@ -52,3 +52,7 @@ devenv.local.yaml
 # Temporary files
 *.tmp
 *.tmp.*
+
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache

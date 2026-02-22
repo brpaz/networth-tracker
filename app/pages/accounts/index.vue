@@ -3,6 +3,8 @@ import { accountTypes } from '~/types';
 
 definePageMeta({ layout: 'default' });
 
+const baseCurrency = useBaseCurrency();
+
 const {
   accounts,
   loading,
@@ -12,7 +14,6 @@ const {
   deleteAccount,
   recordSnapshot,
 } = useAccounts();
-const { formatCurrency } = useFormatters();
 const toast = useToast();
 
 await fetchAccounts();
@@ -36,7 +37,6 @@ const editingAccount = ref<{
 const formData = reactive({
   name: '',
   type: 'stocks' as string,
-  currency: 'EUR',
 });
 
 const showUpdateValue = ref(false);
@@ -47,7 +47,6 @@ function openCreateForm() {
   editingAccount.value = null;
   formData.name = '';
   formData.type = 'stocks';
-  formData.currency = 'EUR';
   showForm.value = true;
 }
 
@@ -55,17 +54,16 @@ function openEditForm(account: { id: number; name: string; type: string; currenc
   editingAccount.value = account;
   formData.name = account.name;
   formData.type = account.type;
-  formData.currency = account.currency;
   showForm.value = true;
 }
 
 async function submitForm() {
   try {
     if (editingAccount.value) {
-      await updateAccount(editingAccount.value.id, { ...formData });
+      await updateAccount(editingAccount.value.id, { ...formData, currency: baseCurrency });
       toast.add({ title: 'Account updated', color: 'success' });
     } else {
-      await createAccount({ ...formData });
+      await createAccount({ ...formData, currency: baseCurrency });
       toast.add({ title: 'Account created', color: 'success' });
     }
     showForm.value = false;
@@ -122,12 +120,12 @@ const typeOptions = accountTypes.map((t) => ({
         <div class="flex items-center justify-between">
           <NuxtLink :to="`/accounts/${account.id}`" class="hover:underline">
             <h3 class="font-semibold">{{ account.name }}</h3>
-            <p class="text-sm text-muted">{{ account.type }} &middot; {{ account.currency }}</p>
+            <p class="text-sm text-muted">{{ account.type }}</p>
           </NuxtLink>
           <div class="flex items-center gap-4">
             <div class="text-right">
               <p class="text-xl font-bold text-primary">
-                {{ formatCurrency(account.currentValue || 0, account.currency) }}
+                {{ formatCurrency(account.currentValue || 0, baseCurrency) }}
               </p>
               <UBadge variant="subtle" color="primary" class="mt-0.5">
                 {{ pct(account.currentValue) }}
@@ -181,9 +179,6 @@ const typeOptions = accountTypes.map((t) => ({
           </UFormField>
           <UFormField label="Type">
             <USelect v-model="formData.type" :items="typeOptions" />
-          </UFormField>
-          <UFormField label="Currency">
-            <UInput v-model="formData.currency" placeholder="EUR" maxlength="3" />
           </UFormField>
         </div>
       </template>
