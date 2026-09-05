@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   app: {
     head: {
+      meta: [{ name: 'theme-color', content: '#0f172a' }],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/icon-16x16.png' },
@@ -12,8 +13,23 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@nuxt/ui', '@nuxt/eslint'],
+  modules: ['@nuxt/ui', '@nuxt/eslint', '@vite-pwa/nuxt'],
   css: ['~/assets/css/main.css'],
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Net Worth Tracker',
+      short_name: 'NetWorth',
+      theme_color: '#0f172a',
+      background_color: '#ffffff',
+      display: 'standalone',
+      icons: [
+        { src: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    },
+  },
 
   devtools: { enabled: true },
 
