@@ -3,12 +3,7 @@
   "description": "A personal net worth tracker built with Nuxt.js",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.34.5",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
-  },
+  "packageManager": "pnpm@12.3.1",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
