@@ -4,7 +4,7 @@
 # Base Stage
 # Setups PNPM and base Dependencies
 # =================================================
-FROM node:24-alpine@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS base
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS base
 RUN apk add --no-cache curl
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -56,7 +56,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 # =================================================
 # Runtime Stage
 # =================================================
-FROM node:24-alpine@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS production
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS production
 
 RUN apk add --no-cache curl libstdc++
 
