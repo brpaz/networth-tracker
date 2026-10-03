@@ -12,6 +12,11 @@
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
+      "description": "Docker Hub restarts the age of a digest whenever the tag is re-pushed, which keeps base image digest updates pending",
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "minimumReleaseAge": null
+    },
+    {
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "github actions"
