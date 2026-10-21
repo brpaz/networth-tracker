@@ -49,7 +49,7 @@
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
-    "@iconify-json/lucide": "1.2.145",
+    "@iconify-json/lucide": "1.2.146",
     "@nuxt/eslint": "1.17.0",
     "@nuxt/test-utils": "4.3.4",
     "@playwright/test": "1.56.1",
