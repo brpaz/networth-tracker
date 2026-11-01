@@ -73,7 +73,8 @@ jobs:
 
   test-e2e:
     name: End-to-End Tests
-    runs-on: ubuntu-latest
+    # Playwright does not support Ubuntu 26.04 (current ubuntu-latest)
+    runs-on: ubuntu-24.04
     needs: lint
     env:
       NUXT_DATABASE_URL: file:${{ github.workspace }}/data/networth.db
