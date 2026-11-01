@@ -3,7 +3,7 @@ inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
   nixpkgs-playwright:
-    url: github:NixOS/nixpkgs/eeb6e13833d0d4d193f5430f0a72487a760842ae
+    url: github:NixOS/nixpkgs/1c89083e451e891152365b799595cf7790a43325
 
 # If you're using non-OSS software, you can set allowUnfree to true.
 # allowUnfree: true
