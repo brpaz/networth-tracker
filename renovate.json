@@ -1,30 +1,36 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", ":automergeMinor", ":prConcurrentLimit10"],
+  "extends": ["config:best-practices", ":automergeMinor", ":prConcurrentLimit10", ":automergeDigest"],
   "labels": ["dependencies"],
-  "reviewers": ["brpaz"],
   "ignoreDeps": ["@playwright/test", "playwright"],
   "minimumReleaseAge": "3 days",
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"]
+    "labels": ["security"],
+    "reviewers": ["brpaz"]
   },
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
+      "description": "One weekly PR for all non-major updates; automerges when CI is green",
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "groupName": "non-major dependencies"
+    },
+    {
+      "description": "Majors need a human",
+      "matchUpdateTypes": ["major"],
+      "reviewers": ["brpaz"]
+    },
+    {
       "description": "Docker Hub restarts the age of a digest whenever the tag is re-pushed, which keeps base image digest updates pending",
       "matchUpdateTypes": ["digest", "pinDigest"],
       "minimumReleaseAge": null
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "github actions"
     }
   ],
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 5am on the first day of the month"],
     "automerge": true
-  }
+  },
+  "schedule": ["before 6am on monday"]
 }
