@@ -38,6 +38,12 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "h3 v1 must match the version Nitro 2 bundles (server handler tests run against it); hold majors until Nuxt moves to Nitro 3 / h3 v2",
+      "matchPackageNames": ["h3"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "description": "Majors need a human",
       "matchUpdateTypes": ["major"],
       "automerge": false,
