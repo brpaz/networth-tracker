@@ -10,7 +10,8 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 COPY package.json ./
-RUN corepack enable && corepack install
+# Node 25+ images no longer bundle corepack.
+RUN npm install --global corepack@0.36.0 && corepack enable && corepack install
 
 # =================================================
 # Dependencies Stage
