@@ -64,7 +64,7 @@
     "prettier": "3.9.10",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vitepress": "2.0.0-alpha.20",
+    "vitepress": "2.0.0-alpha.21",
     "vitest": "5.0.5"
   }
 }
